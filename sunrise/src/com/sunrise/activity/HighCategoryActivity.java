@@ -36,7 +36,6 @@ import android.widget.Toast;
 
 public class HighCategoryActivity extends Activity {
     private static final String Tag_ASSIST = "[ReadTag_RTUrl-Book]";
-    private Context mContext;
     private NfcAdapter mNfcAapter;
     private PendingIntent mNfcPendingIntent;
     
