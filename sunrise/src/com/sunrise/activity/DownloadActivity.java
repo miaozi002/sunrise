@@ -68,13 +68,13 @@ public class DownloadActivity extends Activity {
         //downloadAllFiles();
         
         
-            String path = "http://192.168.0.99/stationfile/station1/pack.station1.json";
+          /*  String path = "http://192.168.0.99/stationfile/station1/pack.station1.json";
             String target = "data/data/com.sunrise/files/pack.station1.json";
-            download(path, target);
+            download(path, target);*/
          
             Intent intent = new Intent(DownloadActivity.this, HighCategoryActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("stationId", 0);
+            bundle.putInt("stationId", 1);
             intent.putExtras(bundle);
             startActivity(intent);
         
