@@ -26,14 +26,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MidCategoryActivity"
-            android:label="@string/title_activity_med" >
-        </activity>
-        <activity
             android:name=".activity.LowCategoryActivity"
             android:label="@string/title_activity_data" >
         </activity>
-        <activity android:name=".activity.DownloadActivity" >
+        <activity android:name=".activity.StationListActivity" >
         </activity>
         <activity
             android:name=".activity.LoginActivity"

@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
-encoding//src/com/sunrise/activity/DownloadActivity.java=gbk
 encoding//src/com/sunrise/activity/HighCategoryActivity.java=UTF-8
 encoding//src/com/sunrise/activity/HomeManageActivity.java=UTF-8
 encoding//src/com/sunrise/activity/LoginActivity.java=UTF-8
+encoding//src/com/sunrise/activity/StationListActivity.java=gbk
 encoding//src/com/sunrise/adapter/StationListAdapter.java=UTF-8
 encoding/<project>=US-ASCII

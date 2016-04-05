@@ -32,7 +32,7 @@ public class HomeManageActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                 case 0:
-                    Intent intent = new Intent(HomeManageActivity.this, DownloadActivity.class);
+                    Intent intent = new Intent(HomeManageActivity.this, StationListActivity.class);
                     startActivity(intent);
                     break;
 
