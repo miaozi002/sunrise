@@ -22,7 +22,7 @@ public class Level1Data {
         this.data = data;
     }
 
-    public Level2Data getDataItem(int id) {
+    public Level2Data getLevel2DataItem(int id) {
         return data.get(id);
     }
 }

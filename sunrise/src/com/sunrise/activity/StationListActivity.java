@@ -63,8 +63,9 @@ public class StationListActivity extends Activity {
                 return;
             switch (msg.what) {
             case MSG_DETAIL_LOAD:
+                @SuppressWarnings("unchecked")
                 List<StationDetail> stationDetails = (List<StationDetail>) msg.obj;
-                mActivity.get().getStationListAdapter().setStationList(stationDetails);
+                mActivity.get().updateStationList(stationDetails);
                 break;
             }
         }
@@ -94,15 +95,16 @@ public class StationListActivity extends Activity {
 
                 Intent intent = new Intent(StationListActivity.this, HighCategoryActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt("stationId", position);
+                bundle.putInt("stationId", stationList.get(position).getId());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
     }
 
-    public StationListAdapter getStationListAdapter() {
-        return stationListAdapter;
+    public void updateStationList(List<StationDetail> stationDetails) {
+        this.stationList = stationDetails;
+        stationListAdapter.setStationList(this.stationList);
     }
 
     private void sendRequestWithHttpClient() {
@@ -134,13 +136,15 @@ public class StationListActivity extends Activity {
     }
 
     public void click(View v) {
-        // downloadAllFiles();
-        //stationList=new ArrayList<StationDetail>();????????????????????????????
-        for(int i=1;i<10; i++){
-            String path = "http://192.168.0.99/stationfile/station"+i+"/pack.station"+i+".json";
-            String target = "data/data/com.sunrise/files/pack.station"+i+".json";
+
+        for (int i = 0; i < stationList.size(); i++) {
+            StationDetail detail = stationList.get(i);
+            int stationId = detail.getId();
+            String jsonFileName = String.format("pack.station%d.json", stationId);
+            String remoteFilePath = String.format("http://192.168.0.99/stationfile/station%d/%s", stationId, jsonFileName);
+            String localFile = String.format("%s/%s", getFilesDir().getAbsolutePath(), jsonFileName);
             HttpUtils utils = new HttpUtils();
-            utils.download(path, target, // 文件保存路径
+            utils.download(remoteFilePath, localFile, // 文件保存路径
                     true, // 是否支持断点续传
                     true, new RequestCallBack<File>() {
 
@@ -165,13 +169,6 @@ public class StationListActivity extends Activity {
                         }
                     });
         }
-
-
-      /* Intent intent = new Intent(StationListActivity.this, HighCategoryActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("stationId", 0);
-        intent.putExtras(bundle);
-        startActivity(intent);*/
 
     }
 

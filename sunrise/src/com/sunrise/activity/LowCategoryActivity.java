@@ -28,11 +28,12 @@ public class LowCategoryActivity extends Activity {
         setContentView(R.layout.activity_lowcategory);
 
         Bundle bundle = this.getIntent().getExtras();
+        stationId = bundle.getInt("stationId");
         highCategoryId = bundle.getInt("highActivityId");
         midCategoryId = bundle.getInt("midActivityId");
         dataId = bundle.getInt("dataId");
         try {
-            Station station = JsonParser.parseAllJsonFiles(getFilesDir()).get(stationId).getData();
+            Station station = JsonParser.getStationWrapper(stationId).getStation();
             List<Level1Data> highCategories = station.getData();
             Level1Data highCategory = highCategories.get(highCategoryId);
             List<Level2Data> categoryList = highCategory.getData();
@@ -41,11 +42,11 @@ public class LowCategoryActivity extends Activity {
             level3Data = cellDataList.get(dataId);
 
             TextView tvDataDetail = (TextView) findViewById(R.id.btn_data_detail);
-            tvDataDetail.setText(
-                    "id: " + level3Data.getId() + "\nNFC: " + level3Data.getNFC() + "\ncode: " + level3Data.getCode()
-                    + "\nName: " + level3Data.getName() + "\nCapacity: " + level3Data.getCapacity()+"\nmodel:"+level3Data.getModel()+"\nmanufactor:"
-                    +level3Data.getManufactor()+"\ntype:"+level3Data.getType()+"\nvlid:"+level3Data.getVlid()+"\nrundate:"+level3Data.getRundate()
-                    +"\nmedev:"+level3Data.getMedev()+"\nisused:"+level3Data.getIsused()+"\nisfault:"+level3Data.getIsfault());
+            tvDataDetail.setText("id: " + level3Data.getId() + "\nNFC: " + level3Data.getNFC() + "\ncode: " + level3Data.getCode() + "\nName: "
+                    + level3Data.getName() + "\nCapacity: " + level3Data.getCapacity() + "\nmodel:" + level3Data.getModel() + "\nmanufactor:"
+                    + level3Data.getManufactor() + "\ntype:" + level3Data.getType() + "\nvlid:" + level3Data.getVlid() + "\nrundate:"
+                    + level3Data.getRundate() + "\nmedev:" + level3Data.getMedev() + "\nisused:" + level3Data.getIsused() + "\nisfault:"
+                    + level3Data.getIsfault());
 
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());

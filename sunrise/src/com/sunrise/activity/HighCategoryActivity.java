@@ -92,6 +92,7 @@ public class HighCategoryActivity extends Activity {
                 level1Id = position;
                 level2Id = -1;
                 level3Id = -1;
+                tv_switch.setText("");
                 lv_left.clearChoices();
                 level1Data = station.getDataItem(level1Id);
                 level2Adapter.setLevelData(level1Data.getData());
@@ -105,8 +106,9 @@ public class HighCategoryActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 level2Id = position;
                 level3Id = -1;
+                tv_switch.setText("");
                 lv_right.clearChoices();
-                level3Adapter.setLevelData(level1Data.getDataItem(level2Id).getData());
+                level3Adapter.setLevelData(level1Data.getLevel2DataItem(level2Id).getData());
                 lv_right.setVisibility(View.VISIBLE);
             }
         });
@@ -115,8 +117,8 @@ public class HighCategoryActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 level3Id = position;
-                String level3DataId = level1Data.getDataItem(level2Id).getData().get(level3Id).getId();
-                tv_switch.setText(level3DataId);
+                String level3DataNFC = level1Data.getLevel2DataItem(level2Id).getLevel3DataItem(level3Id).getNFC();
+                tv_switch.setText(level3DataNFC);
             }
         });
 
@@ -141,132 +143,111 @@ public class HighCategoryActivity extends Activity {
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into onResume");
         super.onResume();
         enableForegroundDispatch();
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "enableForegroundDispatch");
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
-        {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "ACTION_NDEF_DISCOVERED");
             resolveIntent(getIntent());
         } else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(getIntent().getAction())) {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "ACTION_TECH_DISCOVERED");
 
-        } else if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(getIntent().getAction()))
-        {
+        } else if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(getIntent().getAction())) {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "ACTION_Tag_DISCOVERED");
         }
     }
-
-
 
     private void initStation() {
         try {
             Bundle bundle = this.getIntent().getExtras();
             stationId = bundle.getInt("stationId");
-            station = JsonParser.parseAllJsonFiles(getFilesDir()).get(stationId).getData();
+            station = JsonParser.getStationWrapper(stationId).getStation();
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
     }
 
-    private void initNFC()
-    {
+    private void initNFC() {
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into initNFC");
         mNfcPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
     }
 
-    private void enableForegroundDispatch()
-    {
-        if (mNfcAapter != null)
-        {
+    private void enableForegroundDispatch() {
+        if (mNfcAapter != null) {
             mNfcAapter.enableForegroundDispatch(this, mNfcPendingIntent, null, null);
         }
     }
 
-    private void disableForegroundDispatch()
-    {
-        if (mNfcAapter != null){
-        LogUtil.i(MyConstant.Tag, Tag_ASSIST + "disableForegroundDispatch");
-        mNfcAapter.disableForegroundDispatch(this);
+    @SuppressWarnings("unused")
+    private void disableForegroundDispatch() {
+        if (mNfcAapter != null) {
+            LogUtil.i(MyConstant.Tag, Tag_ASSIST + "disableForegroundDispatch");
+            mNfcAapter.disableForegroundDispatch(this);
         }
     }
 
-    void resolveIntent(Intent intent){
-        LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into resolveIntent");
+    void resolveIntent(Intent intent) {
+        LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into resolveIntent");
         String action = intent.getAction();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action))
-        {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
             NdefMessage[] messages = null;
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null)
-            {
+            if (rawMsgs != null) {
                 messages = new NdefMessage[rawMsgs.length];
-                for (int i = 0; i < rawMsgs.length; i++)
-                {
+                for (int i = 0; i < rawMsgs.length; i++) {
                     messages[i] = (NdefMessage) rawMsgs[i];
                 }
-            } else
-            {
-                byte[] empty = new byte[]{};
+            } else {
+                byte[] empty = new byte[] {};
                 NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
-                NdefMessage msg = new NdefMessage(new NdefRecord[]{ record });
-                messages = new NdefMessage[]{ msg};
+                NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
+                messages = new NdefMessage[] { msg };
             }
-           // setTitle(R.string.title_scanned_tag);
-            LogUtil.i(MyConstant.Tag,Tag_ASSIST + "New tag collected");
+            // setTitle(R.string.title_scanned_tag);
+            LogUtil.i(MyConstant.Tag, Tag_ASSIST + "New tag collected");
             processNDEFMsg(messages);
-        } else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()))
-        {
+        } else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
 
-        } else if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
-        {
+        } else if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 
-        } else
-        {
+        } else {
             finish();
             return;
         }
 
     }
 
-    void processNDEFMsg(NdefMessage[] messages)
-    {
-        LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into processNDEFMsg");
-        if (messages == null || messages.length == 0)
-        {
+    void processNDEFMsg(NdefMessage[] messages) {
+        LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into processNDEFMsg");
+        if (messages == null || messages.length == 0) {
             return;
         }
-        for (int i = 0; i < messages.length; i++)
-        {
+        for (int i = 0; i < messages.length; i++) {
             int length = messages[i].getRecords().length;
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "Message" + (i + 1) + "," + "length=" + length);
             NdefRecord[] records = messages[i].getRecords();
-            for (int j = 0; j <length; j++)
-            {
-                for (NdefRecord record : records)
-                {
-                    //LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into resolveIntent");
-                    //short tnf = record.getTnf();
-                    if (isText(record))
-                    {
+            for (int j = 0; j < length; j++) {
+                for (NdefRecord record : records) {
+                    // LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into
+                    // resolveIntent");
+                    // short tnf = record.getTnf();
+                    if (isText(record)) {
                         parseTextRecord(record);
-                    }else if (isUri(record)) {
-                        //parseUriRecord(record);
+                    } else if (isUri(record)) {
+                        // parseUriRecord(record);
                     }
                 }
             }
         }
     }
 
-    private void parseTextRecord(NdefRecord record){
-        /*short tnf = record.getTnf();
-        if (tnf == NdefRecord.TNF_WELL_KNOWN)
-        {
-            parseWellKnowUriRecord(record);
-        }*/
+    private void parseTextRecord(NdefRecord record) {
+        /*
+         * short tnf = record.getTnf(); if (tnf == NdefRecord.TNF_WELL_KNOWN) {
+         * parseWellKnowUriRecord(record); }
+         */
         Preconditions.checkArgument(record.getTnf() == NdefRecord.TNF_WELL_KNOWN);
         Preconditions.checkArgument(Arrays.equals(record.getType(), NdefRecord.RTD_TEXT));
         String palyloadStr = "";
@@ -274,54 +255,49 @@ public class HighCategoryActivity extends Activity {
         Byte statusByte = record.getPayload()[0];
         String textEncoding = "";
         textEncoding = ((statusByte & 0200) == 0) ? "UTF-8" : "UTF-16";
-        int  languageCodeLength = 0;
+        int languageCodeLength = 0;
         languageCodeLength = statusByte & 0077;
+
         String languageCode = "";
         languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
-        try{
+        try {
             palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
-        }catch (UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         tv_switch.setText(palyloadStr);
     }
 
-    public static boolean isText (NdefRecord record){
+    public static boolean isText(NdefRecord record) {
         if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
 
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "TNF_WELL_KNOWN");
-            //tv_switch.setText(record.getType().toString());
+            // tv_switch.setText(record.getType().toString());
             if (Arrays.equals(record.getType(), NdefRecord.RTD_TEXT)) {
                 LogUtil.i(MyConstant.Tag, Tag_ASSIST + "RTD_TEXT");
                 return true;
             } else {
                 return false;
             }
-        }else {
+        } else {
             return false;
         }
     }
 
-    public static boolean isUri (NdefRecord record)
-    {
-        if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN)
-        {
+    public static boolean isUri(NdefRecord record) {
+        if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "TNF_WELL_KNOWN");
-            //tv_switch.setText(record.getType().toString());
-            if (Arrays.equals(record.getType(), NdefRecord.RTD_URI))
-            {
+            // tv_switch.setText(record.getType().toString());
+            if (Arrays.equals(record.getType(), NdefRecord.RTD_URI)) {
                 LogUtil.i(MyConstant.Tag, Tag_ASSIST + "RTD_URI");
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
-        } else if (record.getTnf() == NdefRecord.TNF_ABSOLUTE_URI)
-        {
+        } else if (record.getTnf() == NdefRecord.TNF_ABSOLUTE_URI) {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "TNF_ABSOLUTE_URI");
             return true;
-        } else
-        {
+        } else {
             return false;
         }
     }

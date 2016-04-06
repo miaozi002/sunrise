@@ -4,42 +4,51 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.sunrise.model.StationWrapper;
 
 public class JsonParser {
 
-    private static List<StationWrapper> stations;
-
+    private static Map<Integer, StationWrapper> stationsMap;
+    private static File jsonFileDirectory;
 
     private JsonParser() {
     }
 
+    public static void setJsonDir(File dir) {
+        jsonFileDirectory = dir;
+    }
 
-
-    public static List<StationWrapper> parseAllJsonFiles(File jsonFileDirectory) throws Exception {
-        if (stations != null)
-            return stations;
+    public static StationWrapper getStationWrapper(int id) throws Exception {
+        if (stationsMap != null)
+            return stationsMap.get(id);
 
         File[] jsonFilesDir = jsonFileDirectory.listFiles();
-        stations = new ArrayList<StationWrapper>();
+        stationsMap = new HashMap<Integer, StationWrapper>();
         for (File file : jsonFilesDir) {
             if (file.getName().matches(".*json")) {
-                StationWrapper stationsInOneFile = parseJson(file);
-                if (stationsInOneFile != null)
-                    stations.add(stationsInOneFile);
+                Pattern pattern = Pattern.compile("pack.station(\\d+).json");
+                Matcher matcher = pattern.matcher(file.getName());
+                if (matcher.matches()) {
+                    int stationId = Integer.parseInt(matcher.group(1));
+                    StationWrapper stationsInOneFile = parseJson(file);
+                    if (stationsInOneFile != null)
+                        stationsMap.put(stationId, stationsInOneFile);
+                }
             }
         }
-        return stations;
+        return stationsMap.get(id);
     }
 
     private static StationWrapper parseJson(File jsonFile) throws Exception {
         String jsonContent = readJsonFile(jsonFile);
         Gson gson = new Gson();
-        return gson.fromJson(jsonContent.toString(), StationWrapper.class);
+        return gson.fromJson(jsonContent, StationWrapper.class);
     }
 
     public static String readJsonFile(File jsonFile) throws Exception {

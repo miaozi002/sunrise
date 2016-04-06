@@ -3,6 +3,7 @@ package com.sunrise.model;
 import java.util.List;
 
 public class Station {
+
     private String label;
     private List<Level1Data> data;
 
@@ -25,5 +26,4 @@ public class Station {
     public Level1Data getDataItem(int id) {
         return data.get(id);
     }
-
 }

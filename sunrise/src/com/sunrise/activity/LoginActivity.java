@@ -13,6 +13,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.sunrise.R;
+import com.sunrise.jsonparser.JsonParser;
 import com.sunrise.model.AuthResponse;
 
 import android.app.Activity;
@@ -60,7 +61,7 @@ public class LoginActivity extends Activity {
                 Toast.makeText(mActivity.get(), "Failed to login:" + msg.obj, Toast.LENGTH_SHORT).show();
                 break;
             case MSG_AUTH_SUCESS:
-                mActivity.get().nextScreen();
+                mActivity.get().startNextScreen();
                 break;
             default:
 
@@ -99,10 +100,11 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        JsonParser.setJsonDir(getFilesDir());
+
         setViews();
         setListeners();
         readAccount();
-
     }
 
     private void setViews() {
@@ -111,7 +113,7 @@ public class LoginActivity extends Activity {
         btnLogin = (Button) findViewById(R.id.btn_login);
     }
 
-    private void nextScreen() {
+    private void startNextScreen() {
         startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
         finish();
     }
