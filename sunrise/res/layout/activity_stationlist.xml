@@ -22,17 +22,15 @@
             android:textSize="22sp" />
     </RelativeLayout>
 
-    <GridView
+    <ListView
         android:layout_marginTop="10dp"
-        android:id="@+id/gv_station_name"
+        android:id="@+id/lv_station_name"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:verticalSpacing="4dp" 
-        android:horizontalSpacing="4dp"
-        android:numColumns="1" >
-    </GridView>
+        android:layout_height="300dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        >
+    </ListView>
 
     <ProgressBar
         android:layout_marginTop="10dp"

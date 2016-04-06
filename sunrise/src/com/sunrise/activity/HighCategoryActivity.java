@@ -17,7 +17,6 @@ import com.sunrise.model.Station;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -38,7 +37,7 @@ public class HighCategoryActivity extends Activity {
     private static final String Tag_ASSIST = "[ReadTag_RTUrl-Book]";
     private NfcAdapter mNfcAapter;
     private PendingIntent mNfcPendingIntent;
-    
+
     private static final String LOG_TAG = "sunrise";
 
     private Station station;
@@ -71,7 +70,7 @@ public class HighCategoryActivity extends Activity {
         gv = (GridView) findViewById(R.id.gridView1);
         lv_left = (ListView) findViewById(R.id.listView1);
         lv_right = (ListView) findViewById(R.id.listView2);
-        btn_query = (Button) findViewById(R.id.btn_check);
+        btn_query = (Button) findViewById(R.id.btn_query);
         tv_switch = (TextView) findViewById(R.id.tv_switch);
 
         initStation();
@@ -140,7 +139,8 @@ public class HighCategoryActivity extends Activity {
             }
         });
     }
-    
+
+    @Override
     protected void onResume()
     {
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into onResume");
@@ -159,30 +159,25 @@ public class HighCategoryActivity extends Activity {
             LogUtil.i(MyConstant.Tag, Tag_ASSIST + "ACTION_Tag_DISCOVERED");
         }
     }
-    
-   /* protected void onStop(){
-        LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into onStop");
-        super.onStop();
-        disableForegroundDispatch();
-    }*/
-    
+
+
 
     private void initStation() {
         try {
             Bundle bundle = this.getIntent().getExtras();
             stationId = bundle.getInt("stationId");
-            station = JsonParser.parseAllJsonFiles(getFilesDir()).get(stationId);
+            station = JsonParser.parseAllJsonFiles(getFilesDir()).get(stationId).getData();
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
     }
-    
+
     private void initNFC()
     {
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into initNFC");
         mNfcPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
     }
-    
+
     private void enableForegroundDispatch()
     {
         if (mNfcAapter != null)
@@ -198,7 +193,7 @@ public class HighCategoryActivity extends Activity {
         mNfcAapter.disableForegroundDispatch(this);
         }
     }
-    
+
     void resolveIntent(Intent intent){
         LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into resolveIntent");
         String action = intent.getAction();
@@ -236,7 +231,7 @@ public class HighCategoryActivity extends Activity {
         }
 
     }
-    
+
     void processNDEFMsg(NdefMessage[] messages)
     {
         LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into processNDEFMsg");
@@ -290,7 +285,7 @@ public class HighCategoryActivity extends Activity {
         }
         tv_switch.setText(palyloadStr);
     }
-    
+
     public static boolean isText (NdefRecord record){
         if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
 
@@ -306,7 +301,7 @@ public class HighCategoryActivity extends Activity {
             return false;
         }
     }
-    
+
     public static boolean isUri (NdefRecord record)
     {
         if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN)

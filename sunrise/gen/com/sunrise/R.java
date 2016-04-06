@@ -53,32 +53,32 @@ public final class R {
     }
     public static final class id {
         public static final int action_settings=0x7f09001d;
-        public static final int btn_check=0x7f090008;
         public static final int btn_data_detail=0x7f090012;
         public static final int btn_login=0x7f090010;
         public static final int btn_mid=0x7f09001c;
         public static final int btn_nfc_login=0x7f090018;
+        public static final int btn_query=0x7f090008;
         public static final int cb=0x7f09000f;
         public static final int check_result=0x7f090011;
         public static final int et_login_password=0x7f09000e;
         public static final int et_login_username=0x7f09000c;
         public static final int gridView1=0x7f090001;
         public static final int gv_home=0x7f090009;
-        public static final int gv_station_name=0x7f090014;
         public static final int imageView1=0x7f09000b;
         public static final int imageView2=0x7f09000d;
-        public static final int item_tv_station_name=0x7f090019;
-        public static final int iv_homeitem_icon=0x7f09001a;
+        public static final int item_tv_station_name=0x7f09001b;
+        public static final int iv_homeitem_icon=0x7f090019;
         public static final int listView1=0x7f090003;
         public static final int listView2=0x7f090004;
         public static final int ll_lvgv=0x7f090002;
         public static final int ll_submit=0x7f090006;
+        public static final int lv_station_name=0x7f090014;
         public static final int pb=0x7f090015;
         public static final int read_ndef_tag_rtd_uri_title=0x7f090005;
         public static final int rl_station_name_list=0x7f090013;
         public static final int textView0=0x7f09000a;
         public static final int tv_failure=0x7f090017;
-        public static final int tv_homeitem_name=0x7f09001b;
+        public static final int tv_homeitem_name=0x7f09001a;
         public static final int tv_progress=0x7f090016;
         public static final int tv_switch=0x7f090007;
         public static final int tv_title=0x7f090000;
@@ -89,8 +89,8 @@ public final class R {
         public static final int activity_login=0x7f030002;
         public static final int activity_lowcategory=0x7f030003;
         public static final int activity_stationlist=0x7f030004;
-        public static final int item_gv_title_station_name=0x7f030005;
-        public static final int item_home=0x7f030006;
+        public static final int item_home=0x7f030005;
+        public static final int item_lv_title_station_name=0x7f030006;
         public static final int item_mid=0x7f030007;
     }
     public static final class menu {

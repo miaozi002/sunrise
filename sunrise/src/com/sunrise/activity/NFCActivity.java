@@ -27,16 +27,16 @@ public class NFCActivity extends Activity {
     private PendingIntent mNfcPendingIntent;
     //private TextView mTitle = null;
     public TextView tv_switch = (TextView)findViewById(R.id.tv_switch);
-    
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_highcategory);
-        
+
         //tv_switch = (TextView) findViewById(R.id.tv_switch);
         //mNfcPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        
+
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into onCreate");
         mContext = this;
        // nfcCheck();
@@ -44,8 +44,8 @@ public class NFCActivity extends Activity {
         //initUI();
         initNFC();
     }
-    
-    
+
+
    /* private void nfcCheck(){
         mNfcAapter = NfcAdapter.getDefaultAdapter(this);
         if (mNfcAapter == null){
@@ -54,13 +54,13 @@ public class NFCActivity extends Activity {
             if (!mNfcAapter.isEnabled()){
                 Log.w(com.sunrise.model.MyConstant.Tag, "Your NFC not enable");
                 //LogUtil.i(MyConstant.Tag, Tag_ASSIST + "Your NFC not enable");
-                //跳转NFC设置界面
+                //������NFC������������
                 //startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
                 return;
             }
         }
     }*/
-    
+
     private void initUI()
     {
         tv_switch = (TextView) findViewById(R.id.tv_switch);
@@ -77,7 +77,7 @@ public class NFCActivity extends Activity {
 //    {
 //        mTitle.setText(title);
 //    }
-    
+
     public static boolean isText (NdefRecord record){
         if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
 
@@ -151,11 +151,11 @@ public class NFCActivity extends Activity {
     /*private Dialog SetDialogWidth(Dialog dialog)
     {
         DisplayMetrics dm = new DisplayMetrics();
-        //取的窗口属性
+        //������������������
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        //窗口的宽度
+        //���������������
         int screenWidth = dm.widthPixels;
-        //窗口的高度
+        //���������������
         int screenHeight = dm.heightPixels;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         if (screenWidth > screenHeight)
@@ -171,7 +171,8 @@ public class NFCActivity extends Activity {
 
         return dialog;
     }*/
-    
+
+    @Override
     protected void onResume()
     {
         LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into onResume");
@@ -204,7 +205,7 @@ public class NFCActivity extends Activity {
         disableForegroundDispatch();
     }
 
-//    获取NDEF消息
+//    ������NDEF������
 //    @param intent
     void resolveIntent(Intent intent){
         LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into resolveIntent");
@@ -244,7 +245,7 @@ public class NFCActivity extends Activity {
 
     }
 
-//    获取待解析的NdefMessage
+//    ������������������NdefMessage
 //    @param message
     void processNDEFMsg(NdefMessage[] messages)
     {
@@ -299,7 +300,7 @@ public class NFCActivity extends Activity {
         }
         tv_switch.setText(palyloadStr);
     }
-//    解析NdefMessage
+//    ������NdefMessage
 //    @param record
     /*private void parseUriRecord(NdefRecord record)
     {
@@ -363,6 +364,6 @@ public class NFCActivity extends Activity {
             .put((byte) 0x23, "urn:nfc:").build();*/
 
 
-    
+
 }
 

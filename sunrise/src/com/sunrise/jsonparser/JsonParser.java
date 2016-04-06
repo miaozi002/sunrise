@@ -4,46 +4,45 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.sunrise.model.Station;
+import com.sunrise.model.StationWrapper;
 
 public class JsonParser {
 
-    private static List<Station> stations;
+    private static List<StationWrapper> stations;
+
 
     private JsonParser() {
     }
 
-    public static List<Station> parseAllJsonFiles(File jsonFileDirectory) throws Exception {
+
+
+    public static List<StationWrapper> parseAllJsonFiles(File jsonFileDirectory) throws Exception {
         if (stations != null)
             return stations;
 
         File[] jsonFilesDir = jsonFileDirectory.listFiles();
-        stations = new ArrayList<Station>();
+        stations = new ArrayList<StationWrapper>();
         for (File file : jsonFilesDir) {
             if (file.getName().matches(".*json")) {
-                List<Station> stationsInOneFile = parseJson(file);
+                StationWrapper stationsInOneFile = parseJson(file);
                 if (stationsInOneFile != null)
-                    stations.addAll(stationsInOneFile);
+                    stations.add(stationsInOneFile);
             }
         }
         return stations;
     }
 
-    private static List<Station> parseJson(File jsonFile) throws Exception {
+    private static StationWrapper parseJson(File jsonFile) throws Exception {
         String jsonContent = readJsonFile(jsonFile);
         Gson gson = new Gson();
-        Type typeOfObjectsList = new TypeToken<List<Station>>() {
-        }.getType();
-        return gson.fromJson(jsonContent.toString(), typeOfObjectsList);
+        return gson.fromJson(jsonContent.toString(), StationWrapper.class);
     }
 
-    private static String readJsonFile(File jsonFile) throws Exception {
+    public static String readJsonFile(File jsonFile) throws Exception {
         StringBuffer sb = new StringBuffer();
         InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(jsonFile));
         BufferedReader reader = new BufferedReader(inputStreamReader);

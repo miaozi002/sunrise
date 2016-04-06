@@ -2,10 +2,19 @@ package com.sunrise.model;
 
 public class Level3Data {
 	private String id;
-	private String stid;
 	private String code;
 	private String name;
+	private String NFC;
+	private String rundate;
+	private String medev;
+	private String isused;
+	private String isfault;
+	private String vlid;
+	private String type;
+	private String manufactor;
+	private String model;
 	private String capacity;
+
 
 	public String getId() {
 		return id;
@@ -15,15 +24,80 @@ public class Level3Data {
 		this.id = id;
 	}
 
-	public String getStid() {
-		return stid;
-	}
 
-	public void setStid(String stid) {
-		this.stid = stid;
-	}
+	public String getNFC() {
+        return NFC;
+    }
 
-	public String getCode() {
+    public void setNFC(String nFC) {
+        NFC = nFC;
+    }
+
+    public String getRundate() {
+        return rundate;
+    }
+
+    public void setRundate(String rundate) {
+        this.rundate = rundate;
+    }
+
+    public String getMedev() {
+        return medev;
+    }
+
+    public void setMedev(String medev) {
+        this.medev = medev;
+    }
+
+    public String getIsused() {
+        return isused;
+    }
+
+    public void setIsused(String isused) {
+        this.isused = isused;
+    }
+
+    public String getIsfault() {
+        return isfault;
+    }
+
+    public void setIsfault(String isfault) {
+        this.isfault = isfault;
+    }
+
+    public String getVlid() {
+        return vlid;
+    }
+
+    public void setVlid(String vlid) {
+        this.vlid = vlid;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getManufactor() {
+        return manufactor;
+    }
+
+    public void setManufactor(String manufactor) {
+        this.manufactor = manufactor;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getCode() {
 		return code;
 	}
 
