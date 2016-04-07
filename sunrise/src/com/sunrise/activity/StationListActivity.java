@@ -21,6 +21,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
 import com.sunrise.model.StationDetail;
+import com.sunrise.model.StationVersionManager;
 
 import android.app.Activity;
 import android.content.Context;
@@ -82,7 +83,7 @@ public class StationListActivity extends Activity {
         tvFailure = (TextView) findViewById(R.id.tv_failure);
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
 
-        // initStation();
+
         sendRequestWithHttpClient();
 
         stationListAdapter = new StationListAdapter(this);
@@ -105,6 +106,9 @@ public class StationListActivity extends Activity {
     public void updateStationList(List<StationDetail> stationDetails) {
         this.stationList = stationDetails;
         stationListAdapter.setStationList(this.stationList);
+        StationVersionManager.getInstance().setJsonDir(getFilesDir());
+        StationVersionManager.getInstance().setStationDetailList(this.stationList);
+        StationVersionManager.getInstance().startCheck();
     }
 
     private void sendRequestWithHttpClient() {

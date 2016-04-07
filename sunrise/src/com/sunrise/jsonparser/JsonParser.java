@@ -45,7 +45,7 @@ public class JsonParser {
         return stationsMap.get(id);
     }
 
-    private static StationWrapper parseJson(File jsonFile) throws Exception {
+    public static StationWrapper parseJson(File jsonFile) throws Exception {
         String jsonContent = readJsonFile(jsonFile);
         Gson gson = new Gson();
         return gson.fromJson(jsonContent, StationWrapper.class);

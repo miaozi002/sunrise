@@ -35,6 +35,10 @@ public class HomeManageActivity extends Activity {
                     Intent intent = new Intent(HomeManageActivity.this, StationListActivity.class);
                     startActivity(intent);
                     break;
+                case 5:
+                    /*Intent intent = new Intent(HomeManageActivity.this, StationListActivity.class);
+                    startActivity(intent);*/
+                    break;
 
                 default:
                     break;

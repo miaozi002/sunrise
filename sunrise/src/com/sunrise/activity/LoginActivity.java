@@ -92,6 +92,10 @@ public class LoginActivity extends Activity {
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
+
+
+
+
         }
     }
 
@@ -136,42 +140,62 @@ public class LoginActivity extends Activity {
         btnLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+               if (checkXmlFile()) {
+                   startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
+                   finish();
+               }else {
+                    final String username = etUsername.getText().toString();
+                   final String password = etPassword.getText().toString();
 
-                final String username = etUsername.getText().toString();
-                final String password = etPassword.getText().toString();
+                   if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+                       Toast.makeText(LoginActivity.this, "Input empty!", Toast.LENGTH_SHORT).show();
+                       return;
+                   }
 
-                if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "Input empty!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                   new Thread(new Runnable() {
+                       @Override
+                       public void run() {
+                           String responseStr = getPhpData(username, password);
+                           if (responseStr == null) {
+                               mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
+                               return;
+                           }
+                           AuthResponse response = parseJsonWithGon(responseStr);
+                           if (!TextUtils.isEmpty(response.getErr())) {
+                               mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
+                               return;
+                           }
+                           mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
+                       }
+                   }).start();
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String responseStr = getPhpData(username, password);
-                        if (responseStr == null) {
-                            mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
-                            return;
-                        }
-                        AuthResponse response = parseJsonWithGon(responseStr);
-                        if (!TextUtils.isEmpty(response.getErr())) {
-                            mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
-                            return;
-                        }
-                        mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
-                    }
-                }).start();
+                   CheckBox cb = (CheckBox) findViewById(R.id.cb);
+                   if (cb.isChecked()) {
+                       SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+                       Editor ed = sp.edit();
+                       ed.putString("username", etUsername.getText().toString());
+                       ed.putString("password", etPassword.getText().toString());
+                       ed.commit();
+                   }
 
-                CheckBox cb = (CheckBox) findViewById(R.id.cb);
-                if (cb.isChecked()) {
-                    SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-                    Editor ed = sp.edit();
-                    ed.putString("username", etUsername.getText().toString());
-                    ed.putString("password", etPassword.getText().toString());
-                    ed.commit();
-                }
+               }
+
             }
         });
     }
+
+    protected Boolean checkXmlFile() {
+
+            SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+            String username = sp.getString("username", "");
+            String password = sp.getString("password", "");
+            if (username.equals(etUsername.getText().toString())&&password.equals(etPassword.getText().toString())) {
+                return true;
+            }
+            return false;
+
+        }
+
+
 
 }
