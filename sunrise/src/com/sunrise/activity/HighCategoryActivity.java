@@ -58,9 +58,7 @@ public class HighCategoryActivity extends Activity {
     private Level1DataAdapter level1Adapter;
     private Level2DataAdapter level2Adapter;
     private Level3DataAdapter level3Adapter;
-    //private TextView mTitle;
-    //private TextView mPayload;
-    private NfcAdapter mNfcAdapter;
+    private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent;
     private IntentFilter[] mIntentFilter;
     private String[][] mTechList;
@@ -69,35 +67,37 @@ public class HighCategoryActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_highcategory);
-        //mTitle = (TextView)findViewById(R.id.read_ndef_tag_rtd_uri_title);
-        //mTitle.setText("ReadActivity");
         tv_switch = (TextView)findViewById(R.id.tv_switch);
+
+
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        try {
-            ndef.addDataType("*/*");
-        }
-        catch (IntentFilter.MalformedMimeTypeException e) {
-            throw new RuntimeException("fail", e);
-        }
-        IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        mIntentFilter = new IntentFilter[] {ndef, td};
-        mTechList = new String[][] {
-                new String[] {
-                NfcV.class.getName(),
-                NfcF.class.getName(),
-                NfcA.class.getName(),
-               NfcB.class.getName()
+        if(mNfcAdapter != null) {
+            mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+           try {
+                ndef.addDataType("*/*");
             }
-        };
+            catch (IntentFilter.MalformedMimeTypeException e) {
+                throw new RuntimeException("fail", e);
+            }
+            IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+            mIntentFilter = new IntentFilter[] {ndef, td};
+            mTechList = new String[][] {
+                    new String[] {
+                    NfcV.class.getName(),
+                    NfcF.class.getName(),
+                    NfcA.class.getName(),
+                  NfcB.class.getName()
+                }
+           };
+        }
+
 
         tv_title = (TextView) findViewById(R.id.tv_title);
         gv = (GridView) findViewById(R.id.gridView1);
         lv_left = (ListView) findViewById(R.id.listView1);
         lv_right = (ListView) findViewById(R.id.listView2);
         btn_query = (Button) findViewById(R.id.btn_query);
-        //tv_switch = (TextView) findViewById(R.id.tv_switch);
 
         initStation();
 
@@ -171,15 +171,22 @@ public class HighCategoryActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("HighCategoryActivity:OnResume");
-        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
+
+        if(mNfcAdapter != null){
+            System.out.println("HighCategoryActivity:OnResume");
+             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
+        }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         System.out.println("MainActivity:OnPause");
-        mNfcAdapter.disableForegroundDispatch(this);
+        if(mNfcAdapter != null){
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
+
     }
 
 
