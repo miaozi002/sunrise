@@ -36,8 +36,8 @@ public class HomeManageActivity extends Activity {
                     startActivity(intent);
                     break;
                 case 5:
-                    /*Intent intent = new Intent(HomeManageActivity.this, StationListActivity.class);
-                    startActivity(intent);*/
+                    Intent intent5 = new Intent(HomeManageActivity.this, com.sunrise.CurveActivity.class);
+                    startActivity(intent5);
                     break;
 
                 default:
