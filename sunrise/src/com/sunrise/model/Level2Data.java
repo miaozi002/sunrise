@@ -44,4 +44,14 @@ public class Level2Data {
         this.tbl = tbl;
     }
 
+    public boolean findByNfc(String nfc, NFCSearchInfo info) {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getNFC().equals(nfc)) {
+                info.dataId = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

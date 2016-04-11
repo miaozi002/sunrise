@@ -25,4 +25,15 @@ public class Level1Data {
     public Level2Data getLevel2DataItem(int id) {
         return data.get(id);
     }
+
+    public boolean findByNfc(String nfc, NFCSearchInfo info) {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).findByNfc(nfc, info)) {
+                info.lowCategoryId = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

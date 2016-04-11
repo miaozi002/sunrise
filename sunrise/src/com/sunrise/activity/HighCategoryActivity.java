@@ -11,6 +11,7 @@ import com.sunrise.adapter.Level2DataAdapter;
 import com.sunrise.adapter.Level3DataAdapter;
 import com.sunrise.jsonparser.JsonParser;
 import com.sunrise.model.Level1Data;
+import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.Station;
 
 import android.app.Activity;
@@ -128,16 +129,21 @@ public class HighCategoryActivity extends Activity {
                     Toast.makeText(HighCategoryActivity.this, "请选择对应的子类别", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent intent = new Intent(HighCategoryActivity.this, LowCategoryActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putInt("stationId", stationId);
-                bundle.putInt("highActivityId", level1Id);
-                bundle.putInt("midActivityId", level2Id);
-                bundle.putInt("dataId", level3Id);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                startNextActivity();
             }
+
         });
+    }
+
+    private void startNextActivity() {
+        Intent intent = new Intent(HighCategoryActivity.this, LowCategoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("stationId", stationId);
+        bundle.putInt("highActivityId", level1Id);
+        bundle.putInt("midActivityId", level2Id);
+        bundle.putInt("dataId", level3Id);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override
@@ -231,6 +237,13 @@ public class HighCategoryActivity extends Activity {
             e.printStackTrace();
         }
         tv_switch.setText(palyloadStr);
+        NFCSearchInfo info = new NFCSearchInfo();
+        if (!station.findByNfc(palyloadStr, info))
+            return;
+        level1Id = info.highCategoryId;
+        level2Id = info.lowCategoryId;
+        level3Id = info.dataId;
+        startNextActivity();
     }
 
     private void initStation() {

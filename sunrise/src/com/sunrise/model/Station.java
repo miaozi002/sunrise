@@ -26,4 +26,14 @@ public class Station {
     public Level1Data getDataItem(int id) {
         return data.get(id);
     }
+
+    public boolean findByNfc(String nfc, NFCSearchInfo info) {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).findByNfc(nfc, info)) {
+                info.highCategoryId = i;
+                return true;
+            }
+        }
+        return false;
+    }
 }
