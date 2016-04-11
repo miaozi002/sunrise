@@ -1,10 +1,5 @@
 package com.sunrise.activity;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-
-import com.google.common.base.Preconditions;
 import com.sunrise.R;
 import com.sunrise.adapter.Level1DataAdapter;
 import com.sunrise.adapter.Level2DataAdapter;
@@ -14,18 +9,8 @@ import com.sunrise.model.Level1Data;
 import com.sunrise.model.Station;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.tech.NfcA;
-import android.nfc.tech.NfcB;
-import android.nfc.tech.NfcF;
-import android.nfc.tech.NfcV;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -58,39 +43,37 @@ public class HighCategoryActivity extends Activity {
     private Level1DataAdapter level1Adapter;
     private Level2DataAdapter level2Adapter;
     private Level3DataAdapter level3Adapter;
-    private NfcAdapter mNfcAdapter = null;
+   /* private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent;
     private IntentFilter[] mIntentFilter;
-    private String[][] mTechList;
+    private String[][] mTechList;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_highcategory);
-        tv_switch = (TextView)findViewById(R.id.tv_switch);
 
 
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if(mNfcAdapter != null) {
-            mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-            IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-           try {
-                ndef.addDataType("*/*");
-            }
-            catch (IntentFilter.MalformedMimeTypeException e) {
-                throw new RuntimeException("fail", e);
-            }
-            IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-            mIntentFilter = new IntentFilter[] {ndef, td};
-            mTechList = new String[][] {
-                    new String[] {
-                    NfcV.class.getName(),
-                    NfcF.class.getName(),
-                    NfcA.class.getName(),
-                  NfcB.class.getName()
-                }
-           };
-        }
+
+//        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//            mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+//            IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+//           try {
+//                ndef.addDataType("*/*");
+//            }
+//            catch (IntentFilter.MalformedMimeTypeException e) {
+//                throw new RuntimeException("fail", e);
+//            }
+//            IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+//            mIntentFilter = new IntentFilter[] {ndef, td};
+//            mTechList = new String[][] {
+//                    new String[] {
+//                    NfcV.class.getName(),
+//                    NfcF.class.getName(),
+//                    NfcA.class.getName(),
+//                  NfcB.class.getName()
+//                }
+//           };
 
 
         tv_title = (TextView) findViewById(R.id.tv_title);
@@ -98,6 +81,7 @@ public class HighCategoryActivity extends Activity {
         lv_left = (ListView) findViewById(R.id.listView1);
         lv_right = (ListView) findViewById(R.id.listView2);
         btn_query = (Button) findViewById(R.id.btn_query);
+        tv_switch = (TextView)findViewById(R.id.tv_switch);
 
         initStation();
 
@@ -168,25 +152,18 @@ public class HighCategoryActivity extends Activity {
         });
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
-
-        if(mNfcAdapter != null){
-            System.out.println("HighCategoryActivity:OnResume");
-             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
-        }
-
+        System.out.println("HighCategoryActivity:OnResume");
+        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         System.out.println("MainActivity:OnPause");
-        if(mNfcAdapter != null){
             mNfcAdapter.disableForegroundDispatch(this);
-        }
-
     }
 
 
@@ -195,11 +172,11 @@ public class HighCategoryActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         System.out.println("HighCategoryActivity:OnNewIntent");
-        /**
+        *//**
          * 获取NDEF消息
          *
          * @param intent
-         */
+         *//*
         NdefMessage[] messages = null;
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         if (rawMsgs != null)
@@ -220,11 +197,11 @@ public class HighCategoryActivity extends Activity {
 
     }
 
-    /**
+    *//**
      * 获取待解析的NdefMessage
      *
      * @param messages
-     */
+     *//*
     void processNDEFMsg(NdefMessage[] messages)
     {
         //LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into processNDEFMsg");
@@ -252,11 +229,11 @@ public class HighCategoryActivity extends Activity {
         }
     }
 
-    /**
+    *//**
      *解析NdefMessage
      *
      * @param record
-     */
+     *//*
     private void parseTextRecord(NdefRecord record){
         Preconditions.checkArgument(record.getTnf() == NdefRecord.TNF_WELL_KNOWN);
         Preconditions.checkArgument(Arrays.equals(record.getType(), NdefRecord.RTD_TEXT));
@@ -275,7 +252,7 @@ public class HighCategoryActivity extends Activity {
             e.printStackTrace();
         }
         tv_switch.setText(palyloadStr);
-    }
+    }*/
 
     private void initStation() {
         try {

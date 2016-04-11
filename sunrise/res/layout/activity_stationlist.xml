@@ -21,19 +21,33 @@
             android:textColor="#ffffff"
             android:textSize="22sp" />
     </RelativeLayout>
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp">
+    <ImageButton
+        android:onClick="click"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/imageButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/download"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/download"
+        />
+    </RelativeLayout>
 
     <ListView
-        android:layout_marginTop="10dp"
         android:id="@+id/lv_station_name"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="250dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         >
     </ListView>
 
     <ProgressBar
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:id="@+id/pb"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
@@ -47,6 +61,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp" />
 
+    
+    
     <TextView
         android:id="@+id/tv_failure"
         android:layout_width="wrap_content"
@@ -61,7 +77,7 @@
         android:layout_marginEnd="10dp" >
 
         <Button
-            android:onClick="click"
+            
             android:layout_centerVertical="true"
             android:id="@+id/btn_nfc_login"
             android:layout_width="wrap_content"

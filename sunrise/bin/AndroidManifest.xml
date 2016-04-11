@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="17"
         android:targetSdkVersion="23" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -31,19 +31,19 @@
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+           
         </activity>
         <activity
             android:name=".activity.HomeManageActivity"
             android:label="@string/title_activity_home_manage" >
         </activity>
         <activity
-            android:name="com.sunrise.activity.NFCActivity"
-            android:label="@string/title_activity_nfc" >
+            android:name="com.sunrise.activity.SplashActivity">
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
            
         </activity>
         

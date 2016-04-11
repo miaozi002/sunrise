@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="#bfbfbf">
+    
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" 
+    android:gravity="center">
+    
+    <TextView
+        android:id="@+id/realtime_curve"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_weight="1"
+        android:background="#ffffff"
+        android:text="实时曲线"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="1dp"/>
+    
+    <TextView
+        android:id="@+id/history_curve"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_weight="1"
+        android:background="#ffffff"
+        android:text="历史曲线"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="16dp"/>
+    </LinearLayout>
+    
+</LinearLayout>

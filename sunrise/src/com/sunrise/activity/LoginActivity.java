@@ -32,9 +32,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
+    private EditText etServerUrl;
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+
 
     private static final int MSG_NETWORK_ERROR = 1;
     private static final int MSG_AUTH_ERROR = 2;
@@ -72,14 +74,15 @@ public class LoginActivity extends Activity {
 
     private final LoginActivityMsgHandler mHandler = new LoginActivityMsgHandler(this);
 
-    public static String getPhpData(String username, String password) {
+    public String getPhpData(String serverUrl,String username, String password) {
         try {
             Date date = new Date();
             long time = date.getTime();
 
+
             // shadmin:a
             String path = String.format(Locale.getDefault(),
-                    "http://192.168.0.99/php_data/uiinterface.php?reqType=Userlogin&username=%s&passwd=%s&time=%d", username, password, time);
+                    "http://%s/php_data/uiinterface.php?reqType=Userlogin&username=%s&passwd=%s&time=%d", serverUrl, username, password, time);
 
             HttpGet httpGet = new HttpGet(path);
             HttpClient client = new DefaultHttpClient();
@@ -92,9 +95,6 @@ public class LoginActivity extends Activity {
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
-
-
-
 
         }
     }
@@ -112,6 +112,7 @@ public class LoginActivity extends Activity {
     }
 
     private void setViews() {
+        etServerUrl= (EditText) findViewById(R.id.et_server_url);
         etUsername = (EditText) findViewById(R.id.et_login_username);
         etPassword = (EditText) findViewById(R.id.et_login_password);
         btnLogin = (Button) findViewById(R.id.btn_login);
@@ -124,11 +125,13 @@ public class LoginActivity extends Activity {
 
     public void readAccount() {
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+        String serverUrl=sp.getString("serverUrl", "");
         String username = sp.getString("username", "");
         String password = sp.getString("password", "");
 
         etUsername.setText(username);
         etPassword.setText(password);
+        etServerUrl.setText(serverUrl);
     }
 
     private AuthResponse parseJsonWithGon(String jsonData) {
@@ -144,10 +147,11 @@ public class LoginActivity extends Activity {
                    startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
                    finish();
                }else {
+                   final String serverUrl=etServerUrl.getText().toString();
                     final String username = etUsername.getText().toString();
                    final String password = etPassword.getText().toString();
 
-                   if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+                   if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)||TextUtils.isEmpty(serverUrl)) {
                        Toast.makeText(LoginActivity.this, "Input empty!", Toast.LENGTH_SHORT).show();
                        return;
                    }
@@ -155,7 +159,7 @@ public class LoginActivity extends Activity {
                    new Thread(new Runnable() {
                        @Override
                        public void run() {
-                           String responseStr = getPhpData(username, password);
+                           String responseStr = getPhpData(serverUrl, username, password);
                            if (responseStr == null) {
                                mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
                                return;
@@ -169,10 +173,12 @@ public class LoginActivity extends Activity {
                        }
                    }).start();
 
+
                    CheckBox cb = (CheckBox) findViewById(R.id.cb);
                    if (cb.isChecked()) {
                        SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
                        Editor ed = sp.edit();
+                       ed.putString("serverUrl", etServerUrl.getText().toString());
                        ed.putString("username", etUsername.getText().toString());
                        ed.putString("password", etPassword.getText().toString());
                        ed.commit();
@@ -189,7 +195,8 @@ public class LoginActivity extends Activity {
             SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
             String username = sp.getString("username", "");
             String password = sp.getString("password", "");
-            if (username.equals(etUsername.getText().toString())&&password.equals(etPassword.getText().toString())) {
+            String serverUrl=sp.getString("serverUrl", "");
+            if (username.equals(etUsername.getText().toString())&&password.equals(etPassword.getText().toString())&&serverUrl.equals(etServerUrl.getText().toString())) {
                 return true;
             }
             return false;
