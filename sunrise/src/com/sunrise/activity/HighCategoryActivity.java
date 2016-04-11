@@ -1,5 +1,10 @@
 package com.sunrise.activity;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+
+import com.google.common.base.Preconditions;
 import com.sunrise.R;
 import com.sunrise.adapter.Level1DataAdapter;
 import com.sunrise.adapter.Level2DataAdapter;
@@ -9,8 +14,14 @@ import com.sunrise.model.Level1Data;
 import com.sunrise.model.Station;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -43,45 +54,22 @@ public class HighCategoryActivity extends Activity {
     private Level1DataAdapter level1Adapter;
     private Level2DataAdapter level2Adapter;
     private Level3DataAdapter level3Adapter;
-   /* private NfcAdapter mNfcAdapter = null;
+    private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent;
     private IntentFilter[] mIntentFilter;
-    private String[][] mTechList;*/
+    private String[][] mTechList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_highcategory);
 
-
-
-//        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//            mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-//            IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-//           try {
-//                ndef.addDataType("*/*");
-//            }
-//            catch (IntentFilter.MalformedMimeTypeException e) {
-//                throw new RuntimeException("fail", e);
-//            }
-//            IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-//            mIntentFilter = new IntentFilter[] {ndef, td};
-//            mTechList = new String[][] {
-//                    new String[] {
-//                    NfcV.class.getName(),
-//                    NfcF.class.getName(),
-//                    NfcA.class.getName(),
-//                  NfcB.class.getName()
-//                }
-//           };
-
-
         tv_title = (TextView) findViewById(R.id.tv_title);
         gv = (GridView) findViewById(R.id.gridView1);
         lv_left = (ListView) findViewById(R.id.listView1);
         lv_right = (ListView) findViewById(R.id.listView2);
         btn_query = (Button) findViewById(R.id.btn_query);
-        tv_switch = (TextView)findViewById(R.id.tv_switch);
+        tv_switch = (TextView) findViewById(R.id.tv_switch);
 
         initStation();
 
@@ -152,7 +140,7 @@ public class HighCategoryActivity extends Activity {
         });
     }
 
-    /*@Override
+    @Override
     protected void onResume() {
         super.onResume();
         System.out.println("HighCategoryActivity:OnResume");
@@ -163,65 +151,56 @@ public class HighCategoryActivity extends Activity {
     protected void onPause() {
         super.onPause();
         System.out.println("MainActivity:OnPause");
-            mNfcAdapter.disableForegroundDispatch(this);
+        mNfcAdapter.disableForegroundDispatch(this);
     }
-
-
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         System.out.println("HighCategoryActivity:OnNewIntent");
-        *//**
+        /**
          * 获取NDEF消息
          *
          * @param intent
-         *//*
+         */
         NdefMessage[] messages = null;
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        if (rawMsgs != null)
-        {
+        if (rawMsgs != null) {
             messages = new NdefMessage[rawMsgs.length];
-            for (int i = 0; i < rawMsgs.length; i++)
-            {
+            for (int i = 0; i < rawMsgs.length; i++) {
                 messages[i] = (NdefMessage) rawMsgs[i];
             }
-        } else
-        {
-            byte[] empty = new byte[]{};
+        } else {
+            byte[] empty = new byte[] {};
             NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
-            NdefMessage msg = new NdefMessage(new NdefRecord[]{ record });
-            messages = new NdefMessage[]{ msg};
+            NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
+            messages = new NdefMessage[] { msg };
         }
         processNDEFMsg(messages);
 
     }
 
-    *//**
+    /**
      * 获取待解析的NdefMessage
      *
      * @param messages
-     *//*
-    void processNDEFMsg(NdefMessage[] messages)
-    {
-        //LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into processNDEFMsg");
-        if (messages == null || messages.length == 0)
-        {
+     */
+    void processNDEFMsg(NdefMessage[] messages) {
+        // LogUtil.i(MyConstant.Tag,Tag_ASSIST + "into processNDEFMsg");
+        if (messages == null || messages.length == 0) {
             return;
         }
-        for (int i = 0; i < messages.length; i++)
-        {
+        for (int i = 0; i < messages.length; i++) {
             int length = messages[i].getRecords().length;
-            //LogUtil.i(MyConstant.Tag, Tag_ASSIST + "Message" + (i + 1) + "," + "length=" + length);
+            // LogUtil.i(MyConstant.Tag, Tag_ASSIST + "Message" + (i + 1) + ","
+            // + "length=" + length);
             NdefRecord[] records = messages[i].getRecords();
-            for (int j = 0; j <length; j++)
-            {
-                for (NdefRecord record : records)
-                {
-                    //LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into resolveIntent");
-                    //short tnf = record.getTnf();
-                    if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN)
-                    {
+            for (int j = 0; j < length; j++) {
+                for (NdefRecord record : records) {
+                    // LogUtil.i(MyConstant.Tag, Tag_ASSIST + "into
+                    // resolveIntent");
+                    // short tnf = record.getTnf();
+                    if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
                         parseTextRecord(record);
                     }
                 }
@@ -229,12 +208,12 @@ public class HighCategoryActivity extends Activity {
         }
     }
 
-    *//**
-     *解析NdefMessage
+    /**
+     * 解析NdefMessage
      *
      * @param record
-     *//*
-    private void parseTextRecord(NdefRecord record){
+     */
+    private void parseTextRecord(NdefRecord record) {
         Preconditions.checkArgument(record.getTnf() == NdefRecord.TNF_WELL_KNOWN);
         Preconditions.checkArgument(Arrays.equals(record.getType(), NdefRecord.RTD_TEXT));
         String palyloadStr = "";
@@ -242,17 +221,17 @@ public class HighCategoryActivity extends Activity {
         Byte statusByte = record.getPayload()[0];
         String textEncoding = "";
         textEncoding = ((statusByte & 0200) == 0) ? "UTF-8" : "UTF-16";
-        int  languageCodeLength = 0;
+        int languageCodeLength = 0;
         languageCodeLength = statusByte & 0077;
         String languageCode = "";
         languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
-        try{
+        try {
             palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
-        }catch (UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         tv_switch.setText(palyloadStr);
-    }*/
+    }
 
     private void initStation() {
         try {
