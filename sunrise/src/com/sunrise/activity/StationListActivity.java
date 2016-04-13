@@ -226,6 +226,10 @@ public class StationListActivity extends Activity {
     }
 
     public void click(View v) {
+        if (updateList.size() == 0) {
+            Toast.makeText(StationListActivity.this, "已经是最新版本!", Toast.LENGTH_SHORT);
+            return;
+        }
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         String serverUrl = sp.getString("serverUrl", "");
 
@@ -256,7 +260,7 @@ public class StationListActivity extends Activity {
                                 File f1 = new File(newFilePath);
                                 boolean d1 = f1.getCanonicalFile().renameTo(new File(localFile));
                                 Toast.makeText(StationListActivity.this, arg0.result.getPath(), Toast.LENGTH_SHORT).show();
-                                updateList.remove((Integer)stationId);
+                                updateList.remove((Integer) stationId);
                                 StationListActivity.this.updateVersionUpdateList(updateList);
                                 JsonFileParser.reparseJsonFile(stationId);
                             } catch (Exception e) {
