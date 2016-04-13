@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="变电站运维平台"
+            android:text="变电站设备定位管理"
             android:textColor="#ffffff"
             android:textSize="22sp" />
     </RelativeLayout>

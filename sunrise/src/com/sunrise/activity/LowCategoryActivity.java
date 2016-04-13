@@ -40,13 +40,22 @@ public class LowCategoryActivity extends Activity {
             Level2Data midCategoryList = categoryList.get(midCategoryId);
             List<Level3Data> cellDataList = midCategoryList.getData();
             level3Data = cellDataList.get(dataId);
+            Level3Data fields = midCategoryList.getFields();
+
 
             TextView tvDataDetail = (TextView) findViewById(R.id.btn_data_detail);
-            tvDataDetail.setText("id: " + level3Data.getId() + "\nNFC: " + level3Data.getNFC() + "\ncode: " + level3Data.getCode() + "\nName: "
-                    + level3Data.getName() + "\nCapacity: " + level3Data.getCapacity() + "\nmodel:" + level3Data.getModel() + "\nmanufactor:"
-                    + level3Data.getManufactor() + "\ntype:" + level3Data.getType() + "\nvlid:" + level3Data.getVlid() + "\nrundate:"
-                    + level3Data.getRundate() + "\nmedev:" + level3Data.getMedev() + "\nisused:" + level3Data.getIsused() + "\nisfault:"
-                    + level3Data.getIsfault());
+            tvDataDetail.setText(fields.getTbl()+": "+level3Data.getTbl()+"\n"+fields.getStid()+": "+level3Data.getStid()+"\n" +fields.getId()+": " + level3Data.getId() + "\n"+fields.getVlid()+": "+level3Data.getVlid()+"\n"
+            +fields.getCode()+": "+level3Data.getCode()+"\n"+fields.getName()+": "+ level3Data.getName()+"\n"+fields.getNFC()+": " + level3Data.getNFC() +"\n"+fields.getManufactor()+": "+ level3Data.getManufactor() + "\n"+fields.getFacCode()+": " + level3Data.getFacCode()
+            +  "\n"+fields.getInstalldate()+": " + level3Data.getInstalldate() + "\n"+fields.getPutdate()+": " + level3Data.getPutdate()+"\n"+fields.getFaultdate()+": "+ level3Data.getFaultdate()
+            + "\n" +fields.getUpdatedate()+": "+level3Data.getUpdatedate()+"\n"+fields.getMedev()+": " + level3Data.getMedev()
+            + "\n"+fields.getRepairdate()+": "+level3Data.getRepairdate()+"\n"+fields.getTestdate()+": "+level3Data.getTestdate()+"\n"
+            +fields.getMakedate()+": "+level3Data.getMakedate()+"\n"+fields.getRemark()+": "+level3Data.getRemark()+"\n"+fields.getCapacity()+": "+level3Data.getCapacity()+"\n"+fields.getDevtype()+": "+level3Data.getDevtype()+"\n"
+            +fields.getMaintbl()+": "+level3Data.getMaintbl()+"\n"+fields.getMaindev()+": "+level3Data.getMaindev()+"\n"+fields.getIsused()+": "+level3Data.getIsused()+"\n"+fields.getIsfault()+": "+level3Data.getIsfault()+"\n"
+            +fields.getDefine1()+": "+level3Data.getDefine1()+"\n"+fields.getDefine2()+": "+level3Data.getDefine2()+"\n"+fields.getDefine3()+": "+level3Data.getDefine3()+"\n");
+
+
+
+
 
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());

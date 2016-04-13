@@ -3,38 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="10dp"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
     tools:context=".LowCategoryActivity" >
-
-    <Button
-        android:id="@+id/check_result"
-        android:layout_width="160dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:text="@string/queryResult"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/tv_s"
+   <RelativeLayout
+       android:id="@+id/rl"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_below="@id/check_result"
-        android:layout_marginTop="5dp"
-        android:background="#000000"
-        android:gravity="center"
-        android:text="@string/switchLayer"
-        android:textColor="#ffffff"
-        android:textSize="18sp" />
+        android:layout_height="60dp"
+        android:background="@color/title_bg_blue" >
+
+        <TextView
+            android:id="@+id/textView0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/queryResult"
+            android:textColor="#ffffff"
+            android:textSize="22sp" />
+    </RelativeLayout> 
+
+
+   
 
     <TextView
+        android:layout_marginTop="5dp"
         android:id="@+id/btn_data_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_s"
-        android:layout_marginTop="5dp"
+        android:layout_below="@id/rl"
+        android:layout_marginLeft="20dp"
         android:gravity="start"
-        android:textSize="16sp" />
+        android:textSize="12sp" />
 
 </RelativeLayout>

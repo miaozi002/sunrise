@@ -24,12 +24,9 @@ public class JsonParser {
         jsonFileDirectory = dir;
     }
 
-    public static StationWrapper getStationWrapper(int id) throws Exception {
-        if (stationsMap != null)
-            return stationsMap.get(id);
-
-        File[] jsonFilesDir = jsonFileDirectory.listFiles();
-        stationsMap = new HashMap<Integer, StationWrapper>();
+    public static Map<Integer, StationWrapper> scanAndParseAllJsons(File dir) {
+        File[] jsonFilesDir = dir.listFiles();
+        Map<Integer, StationWrapper> stationsMap = new HashMap<Integer, StationWrapper>();
         for (File file : jsonFilesDir) {
             if (file.getName().matches(".*json")) {
                 Pattern pattern = Pattern.compile("pack.station(\\d+).json");
@@ -42,13 +39,25 @@ public class JsonParser {
                 }
             }
         }
+        return stationsMap;
+    }
+
+    public static StationWrapper getStationWrapper(int id) throws Exception {
+        if (stationsMap != null)
+            return stationsMap.get(id);
+        stationsMap = scanAndParseAllJsons(jsonFileDirectory);
         return stationsMap.get(id);
     }
 
-    public static StationWrapper parseJson(File jsonFile) throws Exception {
-        String jsonContent = readJsonFile(jsonFile);
-        Gson gson = new Gson();
-        return gson.fromJson(jsonContent, StationWrapper.class);
+    public static StationWrapper parseJson(File jsonFile) {
+        try {
+            String jsonContent = readJsonFile(jsonFile);
+            Gson gson = new Gson();
+            return gson.fromJson(jsonContent, StationWrapper.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String readJsonFile(File jsonFile) throws Exception {

@@ -49,7 +49,8 @@ public class StationListActivity extends Activity {
     private TextView tvProgress;
     private TextView tvFailure;
     private ListView lvStationList;
-    public Context context;
+    private Context context;
+    private String serverUrl;
 
     private StationListAdapter stationListAdapter;
     private List<StationDetail> stationList;
@@ -84,11 +85,16 @@ public class StationListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stationlist);
 
+
         pBar = (ProgressBar) findViewById(R.id.pb);
         tvProgress = (TextView) findViewById(R.id.tv_progress);
         tvFailure = (TextView) findViewById(R.id.tv_failure);
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
+
+        SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+        serverUrl = sp.getString("serverUrl", "192.168.0.99");
+        StationVersionManager.getInstance().setServerUrl(serverUrl);
 
         sendRequestWithHttpClient();
 
@@ -106,6 +112,7 @@ public class StationListActivity extends Activity {
             }
         });
     }
+
 
     public void updateStationList(List<StationDetail> stationDetails) {
         this.stationList = stationDetails;
@@ -139,9 +146,6 @@ public class StationListActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-                    String serverUrl = sp.getString("serverUrl", "");
-
                     String path = String.format(Locale.getDefault(),
                             "http://%s/php_data/uiinterface.php?reqType=GetStRtdbofUsr&userid=1&arid=-1&time=1459826514809", serverUrl);
                     HttpClient httpClient = new DefaultHttpClient();
@@ -165,7 +169,7 @@ public class StationListActivity extends Activity {
     }
 
     protected List<StationDetail> parseJSONWithJSONObject(String jsonData) {
-        jsonData = jsonData.replace("Array()", "").trim();
+        //jsonData = jsonData.replace("Array()", "").trim();
         Gson gson = new Gson();
         Type typeOfObjectsList = new TypeToken<List<StationDetail>>() {
         }.getType();
