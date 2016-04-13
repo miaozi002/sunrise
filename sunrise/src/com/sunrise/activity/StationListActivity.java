@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,10 +24,13 @@ import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.sunrise.NFCActivity;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
+import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.StationDetail;
 import com.sunrise.model.StationVersionManager;
+import com.sunrise.model.VersionInfo;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,29 +39,37 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class StationListActivity extends Activity {
-    private static final int MSG_DETAIL_LOAD = 1;
+    public static final int MSG_DETAIL_LOAD = 1;
+    public static final int MSG_VERSION_UPDATED = 2;
+
     private ProgressBar pBar;
     private TextView tvProgress;
     private TextView tvFailure;
     private ListView lvStationList;
-    private Context context;
     private String serverUrl;
+    private Button nfcLogin;
+    private ImageButton downloadButton;
 
     private StationListAdapter stationListAdapter;
     private List<StationDetail> stationList;
+    private List<Integer> updateList;
 
     private final StationDetailMsgHandler mHandler = new StationDetailMsgHandler(this);
 
-    private static class StationDetailMsgHandler extends Handler {
+    public static class StationDetailMsgHandler extends Handler {
         private final WeakReference<StationListActivity> mActivity;
 
         public StationDetailMsgHandler(StationListActivity activity) {
@@ -75,6 +87,16 @@ public class StationListActivity extends Activity {
                 List<StationDetail> stationDetails = (List<StationDetail>) msg.obj;
                 mActivity.get().updateStationList(stationDetails);
                 break;
+            case MSG_VERSION_UPDATED:
+                @SuppressWarnings("unchecked")
+                List<VersionInfo> list = (List<VersionInfo>) msg.obj;
+                List<Integer> updateList = new ArrayList<Integer>();
+                for (VersionInfo vi : list) {
+                    Log.i(StationListActivity.class.getSimpleName(),
+                            String.format("station %d has update. Local version=%d,Server version=%d", vi.id, vi.localVersion, vi.serverVersion));
+                    updateList.add(vi.id);
+                }
+                mActivity.get().updateVersionUpdateList(updateList);
             }
         }
     }
@@ -85,12 +107,22 @@ public class StationListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stationlist);
 
-
         pBar = (ProgressBar) findViewById(R.id.pb);
         tvProgress = (TextView) findViewById(R.id.tv_progress);
         tvFailure = (TextView) findViewById(R.id.tv_failure);
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
+        nfcLogin = (Button) findViewById(R.id.btn_nfc_login);
+        downloadButton = (ImageButton) findViewById(R.id.imageButton1);
+        downloadButton.setVisibility(View.INVISIBLE);
+        nfcLogin.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StationListActivity.this, NFCActivity.class);
+                // startActivity(intent);
+            }
+        });
 
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         serverUrl = sp.getString("serverUrl", "192.168.0.99");
@@ -113,13 +145,21 @@ public class StationListActivity extends Activity {
         });
     }
 
+    public void updateVersionUpdateList(List<Integer> updateList) {
+        this.updateList = updateList;
+        stationListAdapter.setUpdateList(updateList);
+        downloadButton.setVisibility(View.VISIBLE);
+    }
 
     public void updateStationList(List<StationDetail> stationDetails) {
         this.stationList = stationDetails;
         stationListAdapter.setStationList(this.stationList);
-        StationVersionManager.getInstance().setJsonDir(getFilesDir());
-        StationVersionManager.getInstance().setStationDetailList(this.stationList);
-        StationVersionManager.getInstance().startCheck();
+
+        StationVersionManager instance = StationVersionManager.getInstance();
+        instance.setStationDetailList(this.stationList);
+        instance.setJsonDir(getFilesDir());
+        instance.setMsgHandler(mHandler);
+        instance.startCheck();
     }
 
     private void sendRequestWithHttpClient() {
@@ -169,26 +209,34 @@ public class StationListActivity extends Activity {
     }
 
     protected List<StationDetail> parseJSONWithJSONObject(String jsonData) {
-        //jsonData = jsonData.replace("Array()", "").trim();
+        // jsonData = jsonData.replace("Array()", "").trim();
         Gson gson = new Gson();
         Type typeOfObjectsList = new TypeToken<List<StationDetail>>() {
         }.getType();
         return gson.fromJson(jsonData, typeOfObjectsList);
     }
 
-    public void click(View v) {
+    public void cleanTempFiles() {
+        File[] jsonFilesDir = getFilesDir().listFiles();
+        for (File file : jsonFilesDir) {
+            if (file.getName().matches(".*json_new")) {
+                file.delete();
+            }
+        }
+    }
 
+    public void click(View v) {
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         String serverUrl = sp.getString("serverUrl", "");
 
-        for (int i = 0; i < stationList.size(); i++) {
-            StationDetail detail = stationList.get(i);
-            int stationId = detail.getId();
+        for (int i = 0; i < updateList.size(); i++) {
+            final int stationId = updateList.get(i);
             String jsonFileName = String.format("pack.station%d.json", stationId);
             String remoteFilePath = String.format("http://%s/stationfile/station%d/%s", serverUrl, stationId, jsonFileName);
             final String localFile = String.format("%s/%s", getFilesDir().getAbsolutePath(), jsonFileName);
             final String newFilePath = localFile + "_new";
             HttpUtils utils = new HttpUtils();
+            cleanTempFiles();
             utils.download(remoteFilePath, newFilePath, // 文件保存路径
                     true, // 是否支持断点续传
                     true, new RequestCallBack<File>() {
@@ -208,6 +256,9 @@ public class StationListActivity extends Activity {
                                 File f1 = new File(newFilePath);
                                 boolean d1 = f1.getCanonicalFile().renameTo(new File(localFile));
                                 Toast.makeText(StationListActivity.this, arg0.result.getPath(), Toast.LENGTH_SHORT).show();
+                                updateList.remove((Integer)stationId);
+                                StationListActivity.this.updateVersionUpdateList(updateList);
+                                JsonFileParser.reparseJsonFile(stationId);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

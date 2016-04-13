@@ -13,7 +13,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.sunrise.R;
-import com.sunrise.jsonparser.JsonParser;
+import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.AuthResponse;
 
 import android.app.Activity;
@@ -104,7 +104,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        JsonParser.setJsonDir(getFilesDir());
+        JsonFileParser.setJsonDir(getFilesDir());
 
         setViews();
         setListeners();

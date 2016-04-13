@@ -12,20 +12,27 @@ import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import com.sunrise.model.StationWrapper;
 
-public class JsonParser {
+public class JsonFileParser {
 
     private static Map<Integer, StationWrapper> stationsMap;
     private static File jsonFileDirectory;
 
-    private JsonParser() {
+    private JsonFileParser() {
     }
 
     public static void setJsonDir(File dir) {
         jsonFileDirectory = dir;
     }
 
-    public static Map<Integer, StationWrapper> scanAndParseAllJsons(File dir) {
-        File[] jsonFilesDir = dir.listFiles();
+    public static void reparseJsonFile(int stationId) {
+        File file = new File(jsonFileDirectory, String.format("pack.station%d.json", stationId));
+        StationWrapper stationsInOneFile = parseJson(file);
+        if (stationsInOneFile != null)
+            stationsMap.put(stationId, stationsInOneFile);
+    }
+
+    public static Map<Integer, StationWrapper> scanAndParseAllJsons() {
+        File[] jsonFilesDir = jsonFileDirectory.listFiles();
         Map<Integer, StationWrapper> stationsMap = new HashMap<Integer, StationWrapper>();
         for (File file : jsonFilesDir) {
             if (file.getName().matches(".*json")) {
@@ -45,7 +52,7 @@ public class JsonParser {
     public static StationWrapper getStationWrapper(int id) throws Exception {
         if (stationsMap != null)
             return stationsMap.get(id);
-        stationsMap = scanAndParseAllJsons(jsonFileDirectory);
+        stationsMap = scanAndParseAllJsons();
         return stationsMap.get(id);
     }
 

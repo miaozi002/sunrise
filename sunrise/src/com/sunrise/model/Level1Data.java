@@ -1,4 +1,4 @@
-package com.sunrise.model;
+ package com.sunrise.model;
 
 import java.util.List;
 

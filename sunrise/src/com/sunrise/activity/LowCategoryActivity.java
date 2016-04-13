@@ -3,7 +3,7 @@ package com.sunrise.activity;
 import java.util.List;
 
 import com.sunrise.R;
-import com.sunrise.jsonparser.JsonParser;
+import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.Level1Data;
 import com.sunrise.model.Level2Data;
 import com.sunrise.model.Level3Data;
@@ -33,7 +33,7 @@ public class LowCategoryActivity extends Activity {
         midCategoryId = bundle.getInt("midActivityId");
         dataId = bundle.getInt("dataId");
         try {
-            Station station = JsonParser.getStationWrapper(stationId).getStation();
+            Station station = JsonFileParser.getStationWrapper(stationId).getStation();
             List<Level1Data> highCategories = station.getData();
             Level1Data highCategory = highCategories.get(highCategoryId);
             List<Level2Data> categoryList = highCategory.getData();
