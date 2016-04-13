@@ -227,7 +227,7 @@ public class StationListActivity extends Activity {
 
     public void click(View v) {
         if (updateList.size() == 0) {
-            Toast.makeText(StationListActivity.this, "已经是最新版本!", Toast.LENGTH_SHORT);
+            Toast.makeText(StationListActivity.this, "已经是最新版本!", Toast.LENGTH_SHORT).show();
             return;
         }
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
