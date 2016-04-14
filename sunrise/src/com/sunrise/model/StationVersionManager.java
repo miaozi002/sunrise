@@ -50,45 +50,57 @@ public class StationVersionManager {
     }
 
     private void checkServerVersion() throws Exception {
-        for (int i = 0; i < stationDetails.size(); i++) {
-            int stationId = stationDetails.get(i).getId();
-            HttpClient httpClient = new DefaultHttpClient();
-            String url = String.format(Locale.getDefault(), "http://%s/stationfile/station%d/pack.station%d.json", serverUrl, stationId, stationId);
-            HttpGet httpGet = new HttpGet(url);
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            if (httpResponse.getStatusLine().getStatusCode() == 200) {
-                HttpEntity entity = httpResponse.getEntity();
-                String response = EntityUtils.toString(entity, "utf-8");
 
-                JsonParser parser = new JsonParser();
-                JsonObject jsonObject = parser.parse(response).getAsJsonObject();
-                for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                    String key = entry.getKey();
-                    JsonElement ele = entry.getValue();
-                    if (key.equals("jsverb")) {
-                        int serverVersion = ele.getAsInt();
-                        staionVersionMap.get(stationId).serverVersion = serverVersion;
+        try {
+            for (int i = 0; i < stationDetails.size(); i++) {
+                int stationId = stationDetails.get(i).getId();
+
+                HttpClient httpClient = new DefaultHttpClient();
+                String url = String.format(Locale.getDefault(), "http://%s/stationfile/station%d/pack.station%d.json", serverUrl, stationId, stationId);
+                HttpGet httpGet = new HttpGet(url);
+                HttpResponse httpResponse = httpClient.execute(httpGet);
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    HttpEntity entity = httpResponse.getEntity();
+                    String response = EntityUtils.toString(entity, "utf-8");
+
+                    JsonParser parser = new JsonParser();
+                    JsonObject jsonObject = parser.parse(response).getAsJsonObject();
+                    for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                        String key = entry.getKey();
+                        JsonElement ele = entry.getValue();
+                        if (key.equals("jsverb")) {
+                            int serverVersion = ele.getAsInt();
+                            staionVersionMap.get(stationId).serverVersion = serverVersion;
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
     private void checkLocalVersion() throws Exception {
-        for (int i = 0; i < stationDetails.size(); i++) {
-            StationDetail s = stationDetails.get(i);
-            int stationId = s.getId();
+        try {
+            for (int i = 0; i < stationDetails.size(); i++) {
+                StationDetail s = stationDetails.get(i);
+                int stationId = s.getId();
 
-            VersionInfo vi = new VersionInfo();
-            vi.id = stationId;
-            vi.localVersion = 0;
-            vi.serverVersion = 0;
+                VersionInfo vi = new VersionInfo();
+                vi.id = stationId;
+                vi.localVersion = 0;
+                vi.serverVersion = 0;
 
-            StationWrapper w = JsonFileParser.getStationWrapper(stationId);
-            if (w != null) {
-                vi.localVersion = w.getJsverb();
+                StationWrapper w = JsonFileParser.getStationWrapper(stationId);
+                if (w != null) {
+                    vi.localVersion = w.getJsverb();
+                }
+                staionVersionMap.put(stationId, vi);
             }
-            staionVersionMap.put(stationId, vi);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

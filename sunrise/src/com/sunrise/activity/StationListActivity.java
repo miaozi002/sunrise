@@ -24,7 +24,6 @@ import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.sunrise.NFCActivity;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
@@ -41,10 +40,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -60,7 +57,6 @@ public class StationListActivity extends Activity {
     private TextView tvFailure;
     private ListView lvStationList;
     private String serverUrl;
-    private Button nfcLogin;
     private ImageButton downloadButton;
 
     private StationListAdapter stationListAdapter;
@@ -112,17 +108,8 @@ public class StationListActivity extends Activity {
         tvFailure = (TextView) findViewById(R.id.tv_failure);
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
-        nfcLogin = (Button) findViewById(R.id.btn_nfc_login);
         downloadButton = (ImageButton) findViewById(R.id.imageButton1);
         downloadButton.setVisibility(View.INVISIBLE);
-        nfcLogin.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StationListActivity.this, NFCActivity.class);
-                // startActivity(intent);
-            }
-        });
 
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         serverUrl = sp.getString("serverUrl", "192.168.0.99");

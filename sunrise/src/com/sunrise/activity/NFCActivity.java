@@ -1,10 +1,13 @@
-package com.sunrise;
+package com.sunrise.activity;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import com.google.common.base.Preconditions;
+import com.sunrise.R;
+import com.sunrise.R.id;
+import com.sunrise.R.layout;
 import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.Station;
 

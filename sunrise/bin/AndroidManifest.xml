@@ -59,8 +59,12 @@
         </activity>
         <activity android:name="org.achartengine.GraphicalActivity" />
         <activity
-            android:name=".NFCActivity"
+            android:name="com.sunrise.activity.NFCActivity"
             android:label="@string/title_activity_nfc" >
+        </activity>
+        <activity
+            android:name=".TourActivity"
+            android:label="@string/title_activity_tour" >
         </activity>
     </application>
 

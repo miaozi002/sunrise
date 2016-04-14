@@ -12,7 +12,7 @@ import com.sunrise.model.Station;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.EditText;
 
 public class LowCategoryActivity extends Activity {
     private static final String LOG_TAG = "sunrise";
@@ -43,7 +43,7 @@ public class LowCategoryActivity extends Activity {
             Level3Data fields = midCategoryList.getFields();
 
 
-            TextView tvDataDetail = (TextView) findViewById(R.id.btn_data_detail);
+            EditText tvDataDetail = (EditText) findViewById(R.id.et_data_detail);
             tvDataDetail.setText(fields.getTbl()+": "+level3Data.getTbl()+"\n"+fields.getStid()+": "+level3Data.getStid()+"\n" +fields.getId()+": " + level3Data.getId() + "\n"+fields.getVlid()+": "+level3Data.getVlid()+"\n"
             +fields.getCode()+": "+level3Data.getCode()+"\n"+fields.getName()+": "+ level3Data.getName()+"\n"+fields.getNFC()+": " + level3Data.getNFC() +"\n"+fields.getManufactor()+": "+ level3Data.getManufactor() + "\n"+fields.getFacCode()+": " + level3Data.getFacCode()
             +  "\n"+fields.getInstalldate()+": " + level3Data.getInstalldate() + "\n"+fields.getPutdate()+": " + level3Data.getPutdate()+"\n"+fields.getFaultdate()+": "+ level3Data.getFaultdate()

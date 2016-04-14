@@ -1,6 +1,7 @@
 package com.sunrise.activity;
 
 import com.sunrise.R;
+import com.sunrise.TourActivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -34,6 +35,10 @@ public class HomeManageActivity extends Activity {
                 case 0:
                     Intent intent = new Intent(HomeManageActivity.this, StationListActivity.class);
                     startActivity(intent);
+                    break;
+                case 2:
+                    Intent intent2 = new Intent(HomeManageActivity.this, TourActivity.class);
+                    startActivity(intent2);
                     break;
                 case 5:
                     Intent intent5 = new Intent(HomeManageActivity.this, com.sunrise.CurveActivity.class);

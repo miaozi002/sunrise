@@ -4,21 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/title_bg_blue" >
+    
 
         <TextView
-            android:id="@+id/textView0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="变电站设备定位管理"
-            android:textColor="#ffffff"
-            android:textSize="22sp" />
-    </RelativeLayout>
+            style="@style/title_text"
+            android:id="@+id/textView0" 
+            android:text="@string/login_title"/>
+  
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -115,7 +107,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="记住密码" />
+                android:text="记住密码"
+                android:checked="true" />
 
             <Button
                 android:id="@+id/btn_login"
