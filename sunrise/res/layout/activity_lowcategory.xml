@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LowCategoryActivity" >
+    tools:context=".LowCategoryActivity" 
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_query"
         style="@style/title_text"
         android:text="@string/queryResult" />
-    
+
     <ListView
-        android:layout_below="@id/tv_query" 
         android:id="@+id/lv_detail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:descendantFocusability="beforeDescendants" >
     </ListView>
-<!-- 
-    <EditText
-        android:id="@+id/et_data_detail"
+
+    <LinearLayout 
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/textView0"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="5dp"
-        android:gravity="start"
-        android:textSize="12sp" />
- -->
-</RelativeLayout>
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="save"
+            android:text="保存"/>
+         <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="submit"
+            android:text="提交"/>
+        
+    </LinearLayout>
+
+</LinearLayout>
