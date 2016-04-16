@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LowCategoryActivity" >
+
+    <TextView
+        android:id="@+id/tv_query"
+        style="@style/title_text"
+        android:text="@string/queryResult" />
+    
+    <ListView
+        android:layout_below="@id/tv_query" 
+        android:id="@+id/lv_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        
+    </ListView>
+<!-- 
+    <EditText
+        android:id="@+id/et_data_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/textView0"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:gravity="start"
+        android:textSize="12sp" />
+ -->
+</RelativeLayout>
