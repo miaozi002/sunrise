@@ -1,73 +1,146 @@
 {
-"station_name": "田林路站",
-"transformers": {
-    "label": "变压器",
-    "category": {
-        "transformer1":{
-	    "label": "主变",
-	    "data": [
-                {"id": 1, "name": "1#主变", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 2, "name": "2#主变", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 3, "name": "3#主变", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 4, "name": "4#主变", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 5, "name": "5#主变", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
+	data:{
+	"label": "日晖医院综合楼10kV配电站",
+	"data": [
+			{
+				"label": "10kV",
+				"data": [
+					{
+						"label": "主变",
+						"data": [
+							{
+								"id": "11",
+								"stid": "1",
+								"code": "11",
+								"name": "田林路1#主变",
+								"capacity":"42.7",
+								"tbl":"0",
+								"vlid":"0",
+								"NFC":"NFC98764519",
+								"manufactor":"山东蓝翔",
+								"facCode":"Fac001",
+								"installdate":"20160411",
+								"putdate":"20160411",
+								"faultdate":"20160412",
+								"updatedate":"20160413",
+								"repairdate":"20160414",
+								"testdate":"20160415",
+								"makedate":"20160416",
+								"remark":"申瑞电力一期",
+								"devtype":"未注明",
+								"maintbl":"未注明",
+								"maindev":"未注明",
+								"medev":"未注明",
+								"isused":"未注明",
+								"isfault":"未注明",
+								"define1":"",
+								"define2":"",
+								"define3":""
+							},
+							{
+								"capacity": "41.5",
+								"name": "田林路2#主变",
+								"code": "1",
+								"id": "12",
+								"stid": "1",
+								"tbl":"0",
+								"vlid":"0",
+								"NFC":"NFC98764519",
+								"manufactor":"山东蓝翔",
+								"facCode":"Fac001",
+								"installdate":"20160411",
+								"putdate":"20160411",
+								"faultdate":"20160412",
+								"updatedate":"20160413",
+								"repairdate":"20160414",
+								"testdate":"20160415",
+								"makedate":"20160416",
+								"remark":"申瑞电力一期",
+								"devtype":"未注明",
+								"maintbl":"未注明",
+								"maindev":"未注明",
+								"medev":"未注明",
+								"isused":"未注明",
+								"isfault":"未注明",
+								"define1":"",
+								"define2":"",
+								"define3":""
+							}
+						],
+						"fields": {
+							"id": "id",
+							"code": "代码",
+							"name": "名称",
+							"capacity": "容量",
+							"stid": "厂站",
+							"tbl":"表",
+							"vlid":"电压ID",
+							"NFC":"NFC码",
+							"manufactor":"制造商",
+							"facCode":"工厂代号",
+							"installdate":"安装日期",
+							"putdate":"运营日期",
+							"faultdate":"故障日期",
+							"updatedate":"更新日期",
+							"repairdate":"修理日期",
+							"testdate":"测试日期",
+							"makedate":"运营日期",
+							"remark":"描述",
+							"devtype":"设备类型",
+							"maintbl":"主表",
+							"maindev":"主设备",
+							"medev":"浮设备",
+							"isused":"使用中",
+							"isfault":"故障中",
+							"define1":"缺省1",
+							"define2":"缺省2",
+							"define3":"缺省3"
+						},
+						"tbl": "2"
+					},
+					{
+						"label": "电压互感器",
+						"data": [
+							{
+								"id": "1",
+								"code": "1",
+								"name": "田林路2#电流互感器",
+								"capacity": "42",
+								"stid": "1"
+							}
+						],
+						"fields": {
+							"id": "id",
+							"code": "代码",
+							"name": "名称",
+							"capacity": "容量",
+							"stid": "厂站"
+						},
+						"tbl": "3"
+					},
+					{
+						"label": "电流互感器",
+						"data": [
+							{
+								"id": "1",
+								"code": "1",
+								"name": "田林路1#电压互感器",
+								"capacity": "41.53",
+								"stid": "1"
+							}
+						],
+						"fields": {
+							"id": "id",
+							"code": "代码",
+							"name": "名称",
+							"capacity": "容量",
+							"stid": "厂站"
+						},
+						"tbl": "4"
+					}
+				]
+			}
+		]
 	},
-        "transformer2":{
-	    "label": "压变",
-	    "data": [
-                {"id": 11, "name": "1#压变", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 12, "name": "2#压变", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 13, "name": "3#压变", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 14, "name": "4#压变", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 15, "name": "5#压变", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
-	},
-        "transformer3":{
-	    "label": "站变",
-	    "data": [
-                {"id": 21, "name": "1#站变", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 22, "name": "2#站变", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 23, "name": "3#站变", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 24, "name": "4#站变", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 25, "name": "5#站变", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
-	}
-    }
-},
-"breaks": {
-    "label": "断路器",
-    "category": {
-        "break": {
-	    "label": "开关",
-	    "data": [
-                {"id": 1, "name": "1#开关", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 2, "name": "2#开关", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 3, "name": "3#开关", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 4, "name": "4#开关", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 5, "name": "5#开关", "type": 1, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
-	},           
-        "switch": {
-	    "label": "刀闸",
-	    "data": [
-                {"id": 11, "name": "1#刀闸", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 12, "name": "2#刀闸", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 13, "name": "3#刀闸", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 14, "name": "4#刀闸", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 15, "name": "5#刀闸", "type": 2, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
-	},
-        "fuse": {
-	    "label": "熔断器",
-	    "data": [
-                {"id": 21, "name": "1#熔断器", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 22, "name": "2#熔断器", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 23, "name": "3#熔断器", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 24, "name": "4#熔断器", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}, 
-                {"id": 25, "name": "5#熔断器", "type": 3, "manufactor": "上海申瑞", "date": "2016-1-1", "capcity": "200", "ct": "300/3"}
-            ]
-	}
-    }
-}
+	jsver:42
 }

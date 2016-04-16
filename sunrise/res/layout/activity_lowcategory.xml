@@ -3,38 +3,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="10dp"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
     tools:context=".LowCategoryActivity" >
 
-    <Button
-        android:id="@+id/check_result"
-        android:layout_width="160dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:text="@string/queryResult"
-        android:textSize="20sp" />
-
     <TextView
-        android:id="@+id/tv_s"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_below="@id/check_result"
-        android:layout_marginTop="5dp"
-        android:background="#000000"
-        android:gravity="center"
-        android:text="@string/switchLayer"
-        android:textColor="#ffffff"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/btn_data_detail"
+        android:id="@+id/tv_query"
+        style="@style/title_text"
+        android:text="@string/queryResult" />
+    
+    <ListView
+        android:layout_below="@id/tv_query" 
+        android:id="@+id/lv_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_s"
+        >
+        
+    </ListView>
+<!-- 
+    <EditText
+        android:id="@+id/et_data_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/textView0"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginTop="5dp"
         android:gravity="start"
-        android:textSize="16sp" />
-
+        android:textSize="12sp" />
+ -->
 </RelativeLayout>

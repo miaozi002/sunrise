@@ -9,11 +9,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.sunrise.R;
-import com.sunrise.jsonparser.JsonParser;
+import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.AuthResponse;
 
 import android.app.Activity;
@@ -37,12 +38,11 @@ public class LoginActivity extends Activity {
     private EditText etPassword;
     private Button btnLogin;
 
-
     private static final int MSG_NETWORK_ERROR = 1;
     private static final int MSG_AUTH_ERROR = 2;
     private static final int MSG_AUTH_SUCESS = 3;
 
-    private static class LoginActivityMsgHandler extends Handler {
+    private class LoginActivityMsgHandler extends Handler {
         private final WeakReference<LoginActivity> mActivity;
 
         public LoginActivityMsgHandler(LoginActivity activity) {
@@ -56,13 +56,22 @@ public class LoginActivity extends Activity {
                 return;
             switch (msg.what) {
             case MSG_NETWORK_ERROR:
-                Toast.makeText(mActivity.get(), "Network Error!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), "服务器地址错误或者网络异常!", Toast.LENGTH_SHORT).show();
                 break;
 
             case MSG_AUTH_ERROR:
-                Toast.makeText(mActivity.get(), "Failed to login:" + msg.obj, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), "用户名或者密码错误" + msg.obj, Toast.LENGTH_SHORT).show();
                 break;
             case MSG_AUTH_SUCESS:
+                CheckBox cb = (CheckBox) findViewById(R.id.cb);
+                if (cb.isChecked()) {
+                    SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+                    Editor ed = sp.edit();
+                    ed.putString("serverUrl", etServerUrl.getText().toString());
+                    ed.putString("username", etUsername.getText().toString());
+                    ed.putString("password", etPassword.getText().toString());
+                    ed.commit();
+                }
                 mActivity.get().startNextScreen();
                 break;
             default:
@@ -74,18 +83,19 @@ public class LoginActivity extends Activity {
 
     private final LoginActivityMsgHandler mHandler = new LoginActivityMsgHandler(this);
 
-    public String getPhpData(String serverUrl,String username, String password) {
+    public String getPhpData(String serverUrl, String username, String password) {
         try {
             Date date = new Date();
             long time = date.getTime();
 
-
             // shadmin:a
-            String path = String.format(Locale.getDefault(),
-                    "http://%s/php_data/uiinterface.php?reqType=Userlogin&username=%s&passwd=%s&time=%d", serverUrl, username, password, time);
-
-            HttpGet httpGet = new HttpGet(path);
+            String path = String.format(Locale.getDefault(), "http://%s/php_data/uiinterface.php?reqType=Userlogin&username=%s&passwd=%s&time=%d",
+                    serverUrl, username, password, time);
             HttpClient client = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(path);
+            client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 6000);
+            client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 6000);
+
             HttpResponse res = client.execute(httpGet);
 
             if (res.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
@@ -104,7 +114,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        JsonParser.setJsonDir(getFilesDir());
+        JsonFileParser.setJsonDir(getFilesDir());
 
         setViews();
         setListeners();
@@ -112,7 +122,7 @@ public class LoginActivity extends Activity {
     }
 
     private void setViews() {
-        etServerUrl= (EditText) findViewById(R.id.et_server_url);
+        etServerUrl = (EditText) findViewById(R.id.et_server_url);
         etUsername = (EditText) findViewById(R.id.et_login_username);
         etPassword = (EditText) findViewById(R.id.et_login_password);
         btnLogin = (Button) findViewById(R.id.btn_login);
@@ -125,7 +135,7 @@ public class LoginActivity extends Activity {
 
     public void readAccount() {
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-        String serverUrl=sp.getString("serverUrl", "");
+        String serverUrl = sp.getString("serverUrl", "");
         String username = sp.getString("username", "");
         String password = sp.getString("password", "");
 
@@ -143,48 +153,45 @@ public class LoginActivity extends Activity {
         btnLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-               if (checkXmlFile()) {
-                   startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
-                   finish();
-               }else {
-                   final String serverUrl=etServerUrl.getText().toString();
+                if (checkXmlFile()) {
+                    startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
+                    finish();
+                } else {
+                    final String serverUrl = etServerUrl.getText().toString();
                     final String username = etUsername.getText().toString();
-                   final String password = etPassword.getText().toString();
+                    final String password = etPassword.getText().toString();
 
-                   if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)||TextUtils.isEmpty(serverUrl)) {
-                       Toast.makeText(LoginActivity.this, "Input empty!", Toast.LENGTH_SHORT).show();
-                       return;
-                   }
+                    if (TextUtils.isEmpty(username)) {
+                        Toast.makeText(LoginActivity.this, "用户名不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }else if (TextUtils.isEmpty(password)) {
+                        Toast.makeText(LoginActivity.this, "密码不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }else if ( TextUtils.isEmpty(serverUrl)) {
+                        Toast.makeText(LoginActivity.this, "服务器地址不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                   new Thread(new Runnable() {
-                       @Override
-                       public void run() {
-                           String responseStr = getPhpData(serverUrl, username, password);
-                           if (responseStr == null) {
-                               mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
-                               return;
-                           }
-                           AuthResponse response = parseJsonWithGon(responseStr);
-                           if (!TextUtils.isEmpty(response.getErr())) {
-                               mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
-                               return;
-                           }
-                           mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
-                       }
-                   }).start();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String responseStr = getPhpData(serverUrl, username, password);
+                            if (responseStr == null) {
+                                mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
+                                return;
+                            }
+                            AuthResponse response = parseJsonWithGon(responseStr);
+                            if (!TextUtils.isEmpty(response.getErr())) {
+                                mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
+                                return;
+                            }
+                            mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
+                        }
+                    }).start();
 
 
-                   CheckBox cb = (CheckBox) findViewById(R.id.cb);
-                   if (cb.isChecked()) {
-                       SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-                       Editor ed = sp.edit();
-                       ed.putString("serverUrl", etServerUrl.getText().toString());
-                       ed.putString("username", etUsername.getText().toString());
-                       ed.putString("password", etPassword.getText().toString());
-                       ed.commit();
-                   }
 
-               }
+                }
 
             }
         });
@@ -192,17 +199,16 @@ public class LoginActivity extends Activity {
 
     protected Boolean checkXmlFile() {
 
-            SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-            String username = sp.getString("username", "");
-            String password = sp.getString("password", "");
-            String serverUrl=sp.getString("serverUrl", "");
-            if (username.equals(etUsername.getText().toString())&&password.equals(etPassword.getText().toString())&&serverUrl.equals(etServerUrl.getText().toString())) {
-                return true;
-            }
-            return false;
-
+        SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        String serverUrl = sp.getString("serverUrl", "");
+        if (username.equals(etUsername.getText().toString()) && password.equals(etPassword.getText().toString())
+                && serverUrl.equals(etServerUrl.getText().toString())) {
+            return true;
         }
+        return false;
 
-
+    }
 
 }

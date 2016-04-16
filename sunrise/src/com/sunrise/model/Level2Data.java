@@ -2,11 +2,21 @@ package com.sunrise.model;
 
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public class Level2Data {
     private String label;
     private List<Level3Data> data;
     private Level3Data fields;
     private String tbl;
+
+    public JsonObject getFieldsAsMap() {
+        Gson gson = new Gson();
+        JsonElement element = gson.toJsonTree(fields);
+        return element.getAsJsonObject();
+    }
 
     public String getLabel() {
         return label;

@@ -9,20 +9,27 @@ import com.sunrise.R;
 import com.sunrise.adapter.Level1DataAdapter;
 import com.sunrise.adapter.Level2DataAdapter;
 import com.sunrise.adapter.Level3DataAdapter;
-import com.sunrise.jsonparser.JsonParser;
+import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.Level1Data;
 import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.Station;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.tech.NfcA;
+import android.nfc.tech.NfcB;
+import android.nfc.tech.NfcF;
+import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -71,6 +78,19 @@ public class HighCategoryActivity extends Activity {
         lv_right = (ListView) findViewById(R.id.listView2);
         btn_query = (Button) findViewById(R.id.btn_query);
         tv_switch = (TextView) findViewById(R.id.tv_switch);
+        nfcCheck();
+        mPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        try {
+            ndef.addDataType("*/*");
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            throw new RuntimeException("fail", e);
+        }
+        IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        mIntentFilter = new IntentFilter[] { ndef, td };
+        mTechList = new String[][] { new String[] { NfcV.class.getName(), NfcF.class.getName(), NfcA.class.getName(),
+                NfcB.class.getName() } };
 
         initStation();
 
@@ -150,14 +170,18 @@ public class HighCategoryActivity extends Activity {
     protected void onResume() {
         super.onResume();
         System.out.println("HighCategoryActivity:OnResume");
-        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
+        if (mNfcAdapter != null) {
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         System.out.println("MainActivity:OnPause");
-        mNfcAdapter.disableForegroundDispatch(this);
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
     }
 
     @Override
@@ -232,7 +256,8 @@ public class HighCategoryActivity extends Activity {
         String languageCode = "";
         languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
         try {
-            palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+            palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1,
+                    textEncoding);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -246,11 +271,32 @@ public class HighCategoryActivity extends Activity {
         startNextActivity();
     }
 
+    private void nfcCheck() {
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "您的手机不支持NFC功能", Toast.LENGTH_LONG).show();
+            return;
+        } else {
+            if (!mNfcAdapter.isEnabled()) {
+                new AlertDialog.Builder(HighCategoryActivity.this).setTitle("请打开NFC开关")
+                        .setMessage("请打开NFC开关，即可获取NFC标签读取服务")
+                        .setPositiveButton("开启", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                            }
+                        }
+
+                        ).show();
+            }
+        }
+    }
+
     private void initStation() {
         try {
             Bundle bundle = this.getIntent().getExtras();
             stationId = bundle.getInt("stationId");
-            station = JsonParser.getStationWrapper(stationId).getStation();
+            station = JsonFileParser.getStationWrapper(stationId).getStation();
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
