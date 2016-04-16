@@ -61,7 +61,7 @@ public class Level3Data {
         for (Entry<String, JsonElement> entry : entrySet) {
             keyList.add(entry.getKey());
         }
-        return null;
+        return keyList;
     }
 
     public String getTbl() {
