@@ -1,10 +1,13 @@
 package com.sunrise.adapter;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.sunrise.R;
 
 import android.content.Context;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +24,11 @@ public class LowCategoryListViewAdapter extends BaseAdapter {
         layoutInflater = LayoutInflater.from(context);
     }
 
-    public void setData(List<String> keys, List<String> values) {
-        this.keys = keys;
-        this.values = values;
+    public void setData(Collection<String> keys, Collection<String> values) {
+        this.keys = new ArrayList<String>();
+        this.keys.addAll(keys);
+        this.values = new ArrayList<String>();
+        this.values.addAll(values);
         notifyDataSetChanged();
     }
 
@@ -52,6 +57,7 @@ public class LowCategoryListViewAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.tvKey = (TextView) convertView.findViewById(R.id.item_tv_detail);
             holder.etKeyValue = (EditText) convertView.findViewById(R.id.item_et_detail);
+            holder.etKeyValue.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
             convertView.setTag(holder);
         }
         holder = (ViewHolder) convertView.getTag();

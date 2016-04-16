@@ -142,7 +142,7 @@ public class HighCategoryActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 level3Id = position;
-                String level3DataNFC = level1Data.getLevel2DataItem(level2Id).getLevel3DataItem(level3Id).getNFC();
+                String level3DataNFC = level1Data.getLevel2DataItem(level2Id).getLevel3DataItem(level3Id).get("NFC");
                 tv_switch.setText(level3DataNFC);
             }
         });
