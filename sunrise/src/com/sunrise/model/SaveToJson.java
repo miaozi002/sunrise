@@ -1,13 +1,20 @@
 package com.sunrise.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SaveToJson {
     private String tbl;
     private String id;
-    private String manufactor;
-    private String capacity;
-    private Map<String, String> map;
+    private Map<String, String> data;
+
+    public SaveToJson() {
+        data = new HashMap<String, String>();
+    }
+
+    public void saveToMap(String k, String v) {
+        data.put(k, v);
+    }
 
     public String getTbl() {
         return tbl;
@@ -23,22 +30,6 @@ public class SaveToJson {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getManufactor() {
-        return manufactor;
-    }
-
-    public void setManufactor(String manufactor) {
-        this.manufactor = manufactor;
-    }
-
-    public String getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(String capacity) {
-        this.capacity = capacity;
     }
 
 }

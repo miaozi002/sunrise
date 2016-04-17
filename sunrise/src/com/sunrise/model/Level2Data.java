@@ -1,11 +1,13 @@
 package com.sunrise.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sunrise.util.SunriseUtil;
 
 public class Level2Data {
     private String label;
@@ -37,6 +39,29 @@ public class Level2Data {
 
     public void setData(List<Map<String, String>> data) {
         this.data = data;
+    }
+
+    public List<String> getKeyDbName() {
+        return SunriseUtil.toList(fields.keySet());
+    }
+
+    public List<String> getKeyDisplayName() {
+        List<String> keyDbNames = getKeyDbName();
+        List<String> keyDisplayNames = new ArrayList<String>();
+        for (int i = 0; i < keyDbNames.size(); i++) {
+            keyDisplayNames.add(fields.get(keyDbNames.get(i)));
+        }
+        return keyDisplayNames;
+    }
+
+    public List<String> getValues(int level3DataId) {
+        Map<String, String> map = data.get(level3DataId);
+        List<String> valueList = new ArrayList<String>();
+        List<String> keyDbNames = getKeyDbName();
+        for (int i = 0; i < keyDbNames.size(); i++) {
+            valueList.add(map.get(keyDbNames.get(i)));
+        }
+        return valueList;
     }
 
     public Map<String, String> getFields() {
