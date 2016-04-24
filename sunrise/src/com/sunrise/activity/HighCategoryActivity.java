@@ -7,6 +7,7 @@ import com.sunrise.adapter.Level3DataAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
 import com.sunrise.model.Level1Data;
 import com.sunrise.model.Station;
+import com.sunrise.model.StationId;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -40,6 +41,8 @@ public class HighCategoryActivity extends Activity {
     private Level2DataAdapter level2Adapter;
     private Level3DataAdapter level3Adapter;
 
+    private Intent lowCategoryIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,8 @@ public class HighCategoryActivity extends Activity {
         gv = (GridView) findViewById(R.id.gridView1);
         lv_left = (ListView) findViewById(R.id.listView1);
         lv_right = (ListView) findViewById(R.id.listView2);
+        lowCategoryIntent = new Intent(HighCategoryActivity.this, LowCategoryActivity.class);
+        lowCategoryIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         initStation();
 
@@ -69,7 +74,6 @@ public class HighCategoryActivity extends Activity {
                 level1Id = position;
                 level2Id = -1;
                 level3Id = -1;
-                // tv_switch.setText("");
                 lv_left.clearChoices();
                 level1Data = station.getDataItem(level1Id);
                 level2Adapter.setLevelData(level1Data.getData());
@@ -83,7 +87,6 @@ public class HighCategoryActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 level2Id = position;
                 level3Id = -1;
-                // tv_switch.setText("");
                 lv_right.clearChoices();
                 level3Adapter.setLevelData(level1Data.getLevel2DataItem(level2Id).getData());
                 lv_right.setVisibility(View.VISIBLE);
@@ -100,14 +103,17 @@ public class HighCategoryActivity extends Activity {
     }
 
     private void startNextActivity() {
-        Intent intent = new Intent(HighCategoryActivity.this, LowCategoryActivity.class);
+
+        StationId id = new StationId();
+        id.stid = stationId;
+        id.level1Id = level1Id;
+        id.level2Id = level2Id;
+        id.level3Id = level3Id;
+
         Bundle bundle = new Bundle();
-        bundle.putInt("stationId", stationId);
-        bundle.putInt("highActivityId", level1Id);
-        bundle.putInt("midActivityId", level2Id);
-        bundle.putInt("dataId", level3Id);
-        intent.putExtras(bundle);
-        startActivity(intent);
+        bundle.putSerializable("stationId", id);
+        lowCategoryIntent.putExtras(bundle);
+        startActivity(lowCategoryIntent);
     }
 
     private void initStation() {

@@ -18,24 +18,24 @@
             android:text="@string/stationList" />
         
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/ib_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5pt"
             android:background="@android:color/transparent"
             android:contentDescription="@string/download"
-            android:onClick="submit"
+            android:onClick="upload"
             android:layout_gravity="start"
             android:src="@android:drawable/ic_input_add" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/ib_download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5pt"
             android:background="@android:color/transparent"
             android:contentDescription="@string/download"
-            android:onClick="click"
+            android:onClick="download"
             android:layout_gravity="end"
             android:src="@drawable/download" />
     </FrameLayout>

@@ -9,8 +9,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +34,9 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
+import com.sunrise.model.DataSubmit;
+import com.sunrise.model.FileCleaner;
+import com.sunrise.model.FileUploader;
 import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.StationDetail;
 import com.sunrise.model.StationVersionManager;
@@ -70,11 +75,14 @@ import android.widget.Toast;
 public class StationListActivity extends Activity {
     public static final int MSG_DETAIL_LOAD = 1;
     public static final int MSG_VERSION_UPDATED = 2;
+    public static final int MSG_UPLOAD_USERCHANGE_SUCCESS = 3;
+    public static final int MSG_UPLOAD_USERCHANGE_FAIL = 4;
 
     private TextView tvFailure;
     private ListView lvStationList;
     private String serverUrl;
     private ImageButton downloadButton;
+    private ImageButton uploadButton;
     private TextView tv_switch;
     AlertDialog dialog = null;
 
@@ -117,6 +125,14 @@ public class StationListActivity extends Activity {
                     updateList.add(vi.id);
                 }
                 mActivity.get().updateVersionUpdateList(updateList);
+                break;
+            case MSG_UPLOAD_USERCHANGE_SUCCESS:
+                Toast.makeText(mActivity.get(), "上传成功!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case MSG_UPLOAD_USERCHANGE_FAIL:
+                Toast.makeText(mActivity.get(), "上传失败!", Toast.LENGTH_SHORT).show();
+                break;
             }
         }
     }
@@ -129,8 +145,9 @@ public class StationListActivity extends Activity {
 
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
-        downloadButton = (ImageButton) findViewById(R.id.imageButton1);
+        downloadButton = (ImageButton) findViewById(R.id.ib_download);
         downloadButton.setVisibility(View.INVISIBLE);
+        uploadButton = (ImageButton) findViewById(R.id.ib_upload);
         tv_switch = (TextView) findViewById(R.id.tv_switch);
 
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
@@ -157,7 +174,7 @@ public class StationListActivity extends Activity {
         lvStationList.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (stationList.get(position)==null) {
+                if (stationList.get(position) == null) {
                     Toast.makeText(StationListActivity.this, "请先下载json文件", Toast.LENGTH_SHORT).show();
                 }
 
@@ -168,6 +185,7 @@ public class StationListActivity extends Activity {
                 startActivity(intent);
             }
         });
+
     }
 
     public void updateVersionUpdateList(List<Integer> updateList) {
@@ -359,15 +377,44 @@ public class StationListActivity extends Activity {
     }
 
     public void cleanTempFiles() {
-        File[] jsonFilesDir = getFilesDir().listFiles();
-        for (File file : jsonFilesDir) {
-            if (file.getName().matches(".*json_new")) {
-                file.delete();
-            }
+        FileCleaner.cleanFiles(getFilesDir(), ".*json_new");
+    }
+
+    public void upload(View v) {
+        String jsonContent = DataSubmit.instance().commit();
+        try {
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.CHINA);
+            String time = sdf.format(date);
+            final String filename = String.format("modifydev%s.json", time);
+            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+            fos.write(jsonContent.getBytes());
+            fos.close();
+
+            SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
+            final String serverUrl = sp.getString("serverUrl", "");
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    File file = new File(getFilesDir(), filename);
+                    String path = String.format("http://%s/php_data/uiinterface.php?reqType=receivefile&filetype=appdevjson&stid=1", serverUrl);
+                    String r= FileUploader.uploadFile(file, path);
+                    if (r != null) {// upload success
+                        FileCleaner.cleanFiles(getFilesDir(), "modifydev*.json");
+                        DataSubmit.instance().expireOldData();
+                        mHandler.obtainMessage(MSG_UPLOAD_USERCHANGE_SUCCESS).sendToTarget();
+                    }else {
+                        mHandler.obtainMessage(MSG_UPLOAD_USERCHANGE_FAIL).sendToTarget();
+                    }
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void click(View v) {
+    public void download(View v) {
         if (updateList.size() == 0) {
             Toast.makeText(StationListActivity.this, "没有网络或者已经是最新版本!", Toast.LENGTH_SHORT).show();
             return;
@@ -384,7 +431,7 @@ public class StationListActivity extends Activity {
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         String serverUrl = sp.getString("serverUrl", "");
         final AtomicInteger fileCount = new AtomicInteger(updateList.size());
-        Log.i("LM", "count="+fileCount.get());
+        Log.i("LM", "count=" + fileCount.get());
 
         for (int i = 0; i < updateList.size(); i++) {
             final int stationId = updateList.get(i);
@@ -412,15 +459,16 @@ public class StationListActivity extends Activity {
                                 boolean d0 = f0.getCanonicalFile().delete();
                                 File f1 = new File(newFilePath);
                                 boolean d1 = f1.getCanonicalFile().renameTo(new File(localFile));
-                                //Toast.makeText(StationListActivity.this, arg0.result.getPath(), Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(StationListActivity.this,
+                                // arg0.result.getPath(),
+                                // Toast.LENGTH_SHORT).show();
                                 updateList.remove((Integer) stationId);
                                 StationListActivity.this.updateVersionUpdateList(updateList);
                                 JsonFileParser.reparseJsonFile(stationId);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                            }
-                            finally {
-                                if(fileCount.decrementAndGet()==0)
+                            } finally {
+                                if (fileCount.decrementAndGet() == 0)
                                     dialog.dismiss();
                             }
                         }
@@ -428,6 +476,5 @@ public class StationListActivity extends Activity {
         }
 
     }
-
 
 }

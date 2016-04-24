@@ -3,7 +3,6 @@ package com.sunrise.activity;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,19 +12,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import com.google.gson.Gson;
 import com.sunrise.R;
 import com.sunrise.adapter.LowCategoryListViewAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
+import com.sunrise.model.DataSubmit;
 import com.sunrise.model.DataSubmitItem;
+import com.sunrise.model.EditingData;
 import com.sunrise.model.Level1Data;
 import com.sunrise.model.Level2Data;
 import com.sunrise.model.Station;
+import com.sunrise.model.StationId;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
@@ -39,10 +39,7 @@ import android.widget.Toast;
 
 public class LowCategoryActivity extends Activity {
     private static final String LOG_TAG = "sunrise";
-    private int stationId = 0;
-    private int highCategoryId = 0;
-    private int midCategoryId = 0;
-    private int dataId = 0;
+    private StationId stationId;
     private Level2Data level2Data;
     private ListView lvDetail;
     LowCategoryListViewAdapter lowCategoryListViewAdapter;
@@ -57,19 +54,18 @@ public class LowCategoryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lowcategory);
         lvDetail = (ListView) findViewById(R.id.lv_detail);
-
         Bundle bundle = this.getIntent().getExtras();
-        stationId = bundle.getInt("stationId");
-        highCategoryId = bundle.getInt("highActivityId");
-        midCategoryId = bundle.getInt("midActivityId");
-        dataId = bundle.getInt("dataId");
+        stationId = (StationId) bundle.getSerializable("stationId");
 
         try {
-            Station station = JsonFileParser.getStationWrapper(stationId).getStation();
-            Level1Data level1Data = station.getDataItem(highCategoryId);
-            level2Data = level1Data.getLevel2DataItem(midCategoryId);
+            Station station = JsonFileParser.getStationWrapper(stationId.stid).getStation();
+            Level1Data level1Data = station.getDataItem(stationId.level1Id);
+            level2Data = level1Data.getLevel2DataItem(stationId.level2Id);
             lowCategoryListViewAdapter = new LowCategoryListViewAdapter(this);
-            lowCategoryListViewAdapter.setData(level2Data.getKeyDisplayName(), level2Data.getValues(dataId));
+            if (EditingData.instance().getEditValues(stationId) == null) {
+                EditingData.instance().createEditValues(stationId).addAll(level2Data.getValues(stationId.level3Id));
+            }
+            lowCategoryListViewAdapter.setData(level2Data.getKeyDisplayName(), EditingData.instance().getEditValues(stationId));
             lvDetail.setAdapter(lowCategoryListViewAdapter);
 
         } catch (Exception e) {
@@ -107,53 +103,54 @@ public class LowCategoryActivity extends Activity {
 
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
     }
 
     @Override
-    protected void onResume() {
-        // TODO Auto-generated method stub
-        super.onResume();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        super.onRestoreInstanceState(savedInstanceState);
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
     protected void onRestart() {
-        // TODO Auto-generated method stub
         super.onRestart();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void save(View saveButton) {
         StringBuilder sb = new StringBuilder();
 
         List<String> dbKeys = level2Data.getKeyDbName();
-        List<String> originalData = level2Data.getValues(dataId);
-        List<String> currentValues = lowCategoryListViewAdapter.getValues();
+        final List<String> newValues = lowCategoryListViewAdapter.getValues();
+        List<String> editValues = EditingData.instance().getEditValues(stationId);
 
-        DataSubmitItem detail = new DataSubmitItem();
-        detail.setId(originalData.get(dbKeys.indexOf("id")));
-        detail.setTbl(originalData.get(dbKeys.indexOf("tbl")));
+        final DataSubmitItem detail = new DataSubmitItem();
+        detail.setId(editValues.get(dbKeys.indexOf("id")));
+        detail.setTbl(editValues.get(dbKeys.indexOf("tbl")));
 
-        for (int i = 0; i < originalData.size(); i++) {
-            String originalValue = originalData.get(i);
-            String newValue = currentValues.get(i);
+        for (int i = 0; i < editValues.size(); i++) {
+            String editValue = editValues.get(i);
+            String newValue = newValues.get(i);
 
-            if (originalValue == null) {
+            if (editValue == null) {
                 if (newValue != null) {
                     detail.saveToMap(dbKeys.get(i), newValue);
-                    sb.append(level2Data.getKeyDisplayName().get(i) + ":" + originalValue + "->" + newValue + "\n");
+                    sb.append(level2Data.getKeyDisplayName().get(i) + ":" + editValue + "->" + newValue + "\n");
                 }
             } else {
-                if (!originalValue.equals(newValue)) {
+                if (!editValue.equals(newValue)) {
 
                     detail.saveToMap(dbKeys.get(i), newValue);
-                    sb.append(level2Data.getKeyDisplayName().get(i) + ":" + originalValue + "->" + newValue + "\n");
+                    sb.append(level2Data.getKeyDisplayName().get(i) + ":" + editValue + "->" + newValue + "\n");
                 }
             }
         }
@@ -163,17 +160,22 @@ public class LowCategoryActivity extends Activity {
             Toast.makeText(LowCategoryActivity.this, "没有需要更新的数据!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(LowCategoryActivity.this, "更新了以下数据:\n" + changedContentDesc, Toast.LENGTH_LONG).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(LowCategoryActivity.this);
+        builder.setMessage("确定更新以下数据:\n" + changedContentDesc);
+        builder.setPositiveButton("确定", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditingData.instance().setEditValues(stationId, newValues);
+                DataSubmit.instance().addDataToSubmit(detail);
+            }
+        });
+        builder.setNegativeButton("取消", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-        Gson gson = new Gson();
-        String jsonContent = gson.toJson(detail);
-        try {
-            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
-            fos.write(jsonContent.getBytes());
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            }
+        });
+        builder.show();
     }
 
     public void submit(View submitButton) {
