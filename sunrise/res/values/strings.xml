@@ -9,6 +9,7 @@
     <string name="title_activity_data">DataActivity</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="query">查询</string>
+    <string name="scanNFCPrompt">可在本页面扫描NFC(需先按右上角按钮下载厂站信息)</string>
     <string name="input_keyword">输入查询关键字 (或者NFC读取ID)</string>
     <string name="queryResult">查询结果</string>
     <string name="switchLayer">3&#8211;5层开关</string>

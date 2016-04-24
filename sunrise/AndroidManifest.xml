@@ -19,11 +19,12 @@
         <activity
             android:name=".activity.HighCategoryActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            >
         </activity>
         <activity
             android:name=".activity.LowCategoryActivity"
-            android:label="@string/title_activity_data" >
+            android:label="@string/title_activity_data"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity android:name=".activity.StationListActivity" >
         </activity>
@@ -60,10 +61,12 @@
         <activity android:name="org.achartengine.GraphicalActivity" />
         <activity
             android:name="com.sunrise.activity.NFCActivity"
-            android:label="@string/title_activity_nfc" >
+            android:label="@string/title_activity_nfc" 
+            android:launchMode="singleTask">
+            
         </activity>
         <activity
-            android:name=".TourActivity"
+            android:name="com.sunrise.activity.TourActivity"
             android:label="@string/title_activity_tour" >
         </activity>
     </application>

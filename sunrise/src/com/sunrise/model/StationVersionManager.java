@@ -70,7 +70,9 @@ public class StationVersionManager {
                         JsonElement ele = entry.getValue();
                         if (key.equals("jsverb")) {
                             int serverVersion = ele.getAsInt();
-                            staionVersionMap.get(stationId).serverVersion = serverVersion;
+                            VersionInfo versionInfo = staionVersionMap.get(stationId);
+                            if(versionInfo!=null)
+                                versionInfo.serverVersion = serverVersion;
                         }
                     }
                 }
@@ -92,6 +94,7 @@ public class StationVersionManager {
                 vi.localVersion = 0;
                 vi.serverVersion = 0;
 
+                JsonFileParser.reparseJsonFile(stationId);
                 StationWrapper w = JsonFileParser.getStationWrapper(stationId);
                 if (w != null) {
                     vi.localVersion = w.getJsverb();
@@ -99,7 +102,6 @@ public class StationVersionManager {
                 staionVersionMap.put(stationId, vi);
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

@@ -17,7 +17,7 @@
 
     <GridView
         android:id="@+id/gridView1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
@@ -44,7 +44,7 @@
             android:id="@+id/listView1"
             android:layout_width="0dp"
             android:layout_height="220dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:choiceMode="singleChoice"
             android:divider="@null"
@@ -64,43 +64,6 @@
         </ListView>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/read_ndef_tag_rtd_uri_title"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:text="@string/input_keyword"
-        android:textSize="16sp"
-        android:gravity="center" />
-
-    <LinearLayout
-        android:id="@+id/ll_submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/tv_switch"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="4"
-            android:background="#000000"
-            android:gravity="center"
-            android:text="@string/switchLayer"
-            android:textColor="#ffffff"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/btn_query"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/query"
-            android:textSize="16sp" />
-    </LinearLayout>
+   
 
 </LinearLayout>

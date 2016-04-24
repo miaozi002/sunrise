@@ -1,9 +1,9 @@
 package com.sunrise.adapter;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sunrise.R;
-import com.sunrise.model.Level3Data;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,14 +14,14 @@ import android.widget.TextView;
 
 public class Level3DataAdapter extends BaseAdapter {
 
-    private List<Level3Data> level3Data;
+    private List<Map<String, String>> level3Data;
     private LayoutInflater inflater;
 
     public Level3DataAdapter(Context cxt) {
         inflater = LayoutInflater.from(cxt);
     }
 
-    public void setLevelData(List<Level3Data> list) {
+    public void setLevelData(List<Map<String, String>> list) {
         this.level3Data = list;
         notifyDataSetChanged();
     }
@@ -53,7 +53,7 @@ public class Level3DataAdapter extends BaseAdapter {
             convertView.setTag(holder);
         }
         holder = (ViewHolder) convertView.getTag();
-        holder.itemView.setText(level3Data.get(position).getName());
+        holder.itemView.setText(level3Data.get(position).get("name"));
         return convertView;
     }
 

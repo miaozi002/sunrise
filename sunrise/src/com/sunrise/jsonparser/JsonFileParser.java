@@ -4,21 +4,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
+import com.sunrise.model.NFCSearchInfo;
+import com.sunrise.model.Station;
 import com.sunrise.model.StationWrapper;
+
+import android.support.v4.util.ArrayMap;
 
 public class JsonFileParser {
 
-    private static Map<Integer, StationWrapper> stationsMap;
+    private static Map<Integer, StationWrapper> stationsMap = new ArrayMap<Integer, StationWrapper>();
     private static File jsonFileDirectory;
-
-    private JsonFileParser() {
-    }
 
     public static void setJsonDir(File dir) {
         jsonFileDirectory = dir;
@@ -29,11 +29,28 @@ public class JsonFileParser {
         StationWrapper stationsInOneFile = parseJson(file);
         if (stationsInOneFile != null)
             stationsMap.put(stationId, stationsInOneFile);
+        else
+            stationsMap.remove(stationId);
     }
 
-    public static Map<Integer, StationWrapper> scanAndParseAllJsons() {
+    public static boolean findStationByNFC(String nfc, NFCSearchInfo info) {
+        if (stationsMap == null)
+            stationsMap = scanAndParseAllJsons();
+
+        for (Map.Entry<Integer, StationWrapper> entry : stationsMap.entrySet()) {
+            int stationId = entry.getKey();
+            Station station = entry.getValue().getStation();
+            if (station.findByNfc(nfc, info)) {
+                info.stationId = stationId;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Map<Integer, StationWrapper> scanAndParseAllJsons() {
         File[] jsonFilesDir = jsonFileDirectory.listFiles();
-        Map<Integer, StationWrapper> stationsMap = new HashMap<Integer, StationWrapper>();
+        Map<Integer, StationWrapper> stationsMap = new ArrayMap<Integer, StationWrapper>();
         for (File file : jsonFilesDir) {
             if (file.getName().matches(".*json")) {
                 Pattern pattern = Pattern.compile("pack.station(\\d+).json");
@@ -50,14 +67,16 @@ public class JsonFileParser {
     }
 
     public static StationWrapper getStationWrapper(int id) throws Exception {
-        if (stationsMap != null)
+        if (stationsMap.containsKey(id))
             return stationsMap.get(id);
-        stationsMap = scanAndParseAllJsons();
+        reparseJsonFile(id);
         return stationsMap.get(id);
     }
 
-    public static StationWrapper parseJson(File jsonFile) {
+    private static StationWrapper parseJson(File jsonFile) {
         try {
+            if (!jsonFile.exists())
+                return null;
             String jsonContent = readJsonFile(jsonFile);
             Gson gson = new Gson();
             return gson.fromJson(jsonContent, StationWrapper.class);
@@ -73,7 +92,7 @@ public class JsonFileParser {
         BufferedReader reader = new BufferedReader(inputStreamReader);
         String line = reader.readLine();
         while (line != null) {
-            sb.append(line);
+            sb.append(line + "\r");
             line = reader.readLine();
         }
         reader.close();

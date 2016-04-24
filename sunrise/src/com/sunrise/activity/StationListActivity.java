@@ -5,11 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
@@ -27,24 +32,38 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
+import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.StationDetail;
 import com.sunrise.model.StationVersionManager;
 import com.sunrise.model.VersionInfo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.tech.NfcA;
+import android.nfc.tech.NfcB;
+import android.nfc.tech.NfcF;
+import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,16 +71,21 @@ public class StationListActivity extends Activity {
     public static final int MSG_DETAIL_LOAD = 1;
     public static final int MSG_VERSION_UPDATED = 2;
 
-    private ProgressBar pBar;
-    private TextView tvProgress;
     private TextView tvFailure;
     private ListView lvStationList;
     private String serverUrl;
     private ImageButton downloadButton;
+    private TextView tv_switch;
+    AlertDialog dialog = null;
 
     private StationListAdapter stationListAdapter;
     private List<StationDetail> stationList;
     private List<Integer> updateList;
+
+    private NfcAdapter mNfcAdapter = null;
+    private PendingIntent mPendingIntent;
+    private IntentFilter[] mIntentFilter;
+    private String[][] mTechList;
 
     private final StationDetailMsgHandler mHandler = new StationDetailMsgHandler(this);
 
@@ -103,17 +127,28 @@ public class StationListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stationlist);
 
-        pBar = (ProgressBar) findViewById(R.id.pb);
-        tvProgress = (TextView) findViewById(R.id.tv_progress);
-        tvFailure = (TextView) findViewById(R.id.tv_failure);
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
         downloadButton = (ImageButton) findViewById(R.id.imageButton1);
         downloadButton.setVisibility(View.INVISIBLE);
+        tv_switch = (TextView) findViewById(R.id.tv_switch);
 
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         serverUrl = sp.getString("serverUrl", "192.168.0.99");
         StationVersionManager.getInstance().setServerUrl(serverUrl);
+
+        nfcCheck();
+
+        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        try {
+            ndef.addDataType("*/*");
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            throw new RuntimeException("fail", e);
+        }
+        IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        mIntentFilter = new IntentFilter[] { ndef, td };
+        mTechList = new String[][] { new String[] { NfcV.class.getName(), NfcF.class.getName(), NfcA.class.getName(), NfcB.class.getName() } };
 
         sendRequestWithHttpClient();
 
@@ -122,6 +157,9 @@ public class StationListActivity extends Activity {
         lvStationList.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (stationList.get(position)==null) {
+                    Toast.makeText(StationListActivity.this, "请先下载json文件", Toast.LENGTH_SHORT).show();
+                }
 
                 Intent intent = new Intent(StationListActivity.this, HighCategoryActivity.class);
                 Bundle bundle = new Bundle();
@@ -195,8 +233,125 @@ public class StationListActivity extends Activity {
         }).start();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("HighCategoryActivity:OnResume");
+        if (mNfcAdapter != null) {
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilter, mTechList);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("MainActivity:OnPause");
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        System.out.println("HighCategoryActivity:OnNewIntent");
+        NdefMessage[] messages = null;
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        if (rawMsgs != null) {
+            messages = new NdefMessage[rawMsgs.length];
+            for (int i = 0; i < rawMsgs.length; i++) {
+                messages[i] = (NdefMessage) rawMsgs[i];
+            }
+        } else {
+            byte[] empty = new byte[] {};
+            NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
+            NdefMessage msg = new NdefMessage(new NdefRecord[] { record });
+            messages = new NdefMessage[] { msg };
+        }
+        processNDEFMsg(messages);
+
+    }
+
+    private void nfcCheck() {
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "您的手机不支持NFC功能", Toast.LENGTH_LONG).show();
+            return;
+        } else {
+            if (!mNfcAdapter.isEnabled()) {
+                new AlertDialog.Builder(StationListActivity.this).setTitle("请打开NFC开关").setMessage("请打开NFC开关，即可获取NFC标签读取服务")
+                        .setPositiveButton("开启", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                            }
+                        }
+
+                        ).show();
+            }
+        }
+    }
+
+    /**
+     * 获取待解析的NdefMessage
+     *
+     * @param messages
+     */
+    void processNDEFMsg(NdefMessage[] messages) {
+        if (messages == null || messages.length == 0) {
+            return;
+        }
+        for (int i = 0; i < messages.length; i++) {
+            int length = messages[i].getRecords().length;
+            NdefRecord[] records = messages[i].getRecords();
+            for (int j = 0; j < length; j++) {
+                for (NdefRecord record : records) {
+
+                    if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN) {
+                        parseTextRecord(record);
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseTextRecord(NdefRecord record) {
+        Preconditions.checkArgument(record.getTnf() == NdefRecord.TNF_WELL_KNOWN);
+        Preconditions.checkArgument(Arrays.equals(record.getType(), NdefRecord.RTD_TEXT));
+        String palyloadStr = "";
+        byte[] payload = record.getPayload();
+        Byte statusByte = record.getPayload()[0];
+        String textEncoding = "";
+        textEncoding = ((statusByte & 0200) == 0) ? "UTF-8" : "UTF-16";
+        int languageCodeLength = 0;
+        languageCodeLength = statusByte & 0077;
+        String languageCode = "";
+        languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
+        try {
+            palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        tv_switch.setText(palyloadStr);
+        NFCSearchInfo info = new NFCSearchInfo();
+        if (!JsonFileParser.findStationByNFC(palyloadStr, info))
+            return;
+        startNextActivity(info.stationId, info.highCategoryId, info.lowCategoryId, info.dataId);
+        tv_switch.setText("可在本页面扫描NFC");
+    }
+
+    private void startNextActivity(int stationId, int id1, int id2, int id3) {
+        Intent intent = new Intent(StationListActivity.this, LowCategoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("stationId", stationId);
+        bundle.putInt("highActivityId", id1);
+        bundle.putInt("midActivityId", id2);
+        bundle.putInt("dataId", id3);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
     protected List<StationDetail> parseJSONWithJSONObject(String jsonData) {
-        // jsonData = jsonData.replace("Array()", "").trim();
         Gson gson = new Gson();
         Type typeOfObjectsList = new TypeToken<List<StationDetail>>() {
         }.getType();
@@ -214,11 +369,22 @@ public class StationListActivity extends Activity {
 
     public void click(View v) {
         if (updateList.size() == 0) {
-            Toast.makeText(StationListActivity.this, "已经是最新版本!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StationListActivity.this, "没有网络或者已经是最新版本!", Toast.LENGTH_SHORT).show();
             return;
+        } else {
+            AlertDialog.Builder builder = new Builder(this);
+            // 初始化对话框布局
+            View dialogView = View.inflate(getApplicationContext(), R.layout.dialog, null);
+            dialog = builder.create();
+            dialog.setView(dialogView, 0, 0, 0, 0);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
         }
         SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
         String serverUrl = sp.getString("serverUrl", "");
+        final AtomicInteger fileCount = new AtomicInteger(updateList.size());
+        Log.i("LM", "count="+fileCount.get());
 
         for (int i = 0; i < updateList.size(); i++) {
             final int stationId = updateList.get(i);
@@ -246,25 +412,22 @@ public class StationListActivity extends Activity {
                                 boolean d0 = f0.getCanonicalFile().delete();
                                 File f1 = new File(newFilePath);
                                 boolean d1 = f1.getCanonicalFile().renameTo(new File(localFile));
-                                Toast.makeText(StationListActivity.this, arg0.result.getPath(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(StationListActivity.this, arg0.result.getPath(), Toast.LENGTH_SHORT).show();
                                 updateList.remove((Integer) stationId);
                                 StationListActivity.this.updateVersionUpdateList(updateList);
                                 JsonFileParser.reparseJsonFile(stationId);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                        }
-
-                        @Override
-                        public void onLoading(long total, long current, boolean isUploading) {
-                            super.onLoading(total, current, isUploading);
-                            pBar.setMax((int) total);
-                            pBar.setProgress((int) current);
-                            tvProgress.setText(current * 100 / total + "%");
+                            finally {
+                                if(fileCount.decrementAndGet()==0)
+                                    dialog.dismiss();
+                            }
                         }
                     });
         }
 
     }
+
 
 }

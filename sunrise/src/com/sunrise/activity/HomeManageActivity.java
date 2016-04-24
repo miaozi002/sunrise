@@ -1,7 +1,6 @@
 package com.sunrise.activity;
 
 import com.sunrise.R;
-import com.sunrise.TourActivity;
 
 import android.app.Activity;
 import android.content.Intent;
