@@ -3,24 +3,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="20dp"
     tools:context="com.sunrise.activity.HighCategoryActivity" >
 
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="15dp"
-        android:textColor="#00BFFF"
-        android:textSize="18sp" />
+        style="@style/title_text" />
+
+    <LinearLayout
+        android:id="@+id/ll_lvgv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:choiceMode="singleChoice"
+            android:divider="@null"
+            android:dividerHeight="4dp" >
+        </ListView>
+
+        <ListView
+            android:id="@+id/listView2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:choiceMode="singleChoice"
+            android:divider="@null"
+            android:dividerHeight="4dp" >
+        </ListView>
+    </LinearLayout>
 
     <GridView
         android:id="@+id/gridView1"
         android:layout_width="wrap_content"
-        android:layout_height="80dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
         android:alwaysDrawnWithCache="true"
         android:choiceMode="singleChoice"
         android:drawSelectorOnTop="false"
@@ -29,41 +58,5 @@
         android:listSelector="@android:color/transparent"
         android:numColumns="2"
         android:verticalSpacing="10dp" />
-
-    <LinearLayout
-        android:id="@+id/ll_lvgv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal" >
-
-        <ListView
-            android:id="@+id/listView1"
-            android:layout_width="0dp"
-            android:layout_height="220dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:choiceMode="singleChoice"
-            android:divider="@null"
-            android:dividerHeight="4dp"
-            android:visibility="invisible" >
-        </ListView>
-
-        <ListView
-            android:id="@+id/listView2"
-            android:layout_width="0dp"
-            android:layout_height="220dp"
-            android:layout_weight="1"
-            android:choiceMode="singleChoice"
-            android:divider="@null"
-            android:dividerHeight="4dp"
-            android:visibility="invisible" >
-        </ListView>
-    </LinearLayout>
-
-   
 
 </LinearLayout>

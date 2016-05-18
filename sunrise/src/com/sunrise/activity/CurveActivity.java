@@ -1,5 +1,7 @@
-package com.sunrise;
+package com.sunrise.activity;
 
+
+import com.sunrise.R;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.sunrise;
+package com.sunrise.model;
 
 import java.io.Serializable;
 import java.util.Date;

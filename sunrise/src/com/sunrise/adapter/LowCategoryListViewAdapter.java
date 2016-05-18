@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import com.sunrise.R;
+import com.sunrise.activity.LowCategoryActivity;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -21,9 +21,11 @@ public class LowCategoryListViewAdapter extends BaseAdapter {
     private List<String> keys;
     private List<String> values;
     private LayoutInflater layoutInflater;
+    private LowCategoryActivity activity;
 
-    public LowCategoryListViewAdapter(Context context) {
-        layoutInflater = LayoutInflater.from(context);
+    public LowCategoryListViewAdapter(LowCategoryActivity context) {
+        activity = context;
+        layoutInflater = LayoutInflater.from(activity);
     }
 
     public void setData(Collection<String> keys, Collection<String> values) {
@@ -68,6 +70,7 @@ public class LowCategoryListViewAdapter extends BaseAdapter {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                activity.setSaveButtonVisible();
             }
 
             @Override

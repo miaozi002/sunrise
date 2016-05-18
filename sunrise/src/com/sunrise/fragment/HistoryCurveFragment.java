@@ -1,4 +1,4 @@
-package com.sunrise;
+package com.sunrise.fragment;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,6 +22,11 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sunrise.PopuItem;
+import com.sunrise.PopuJar;
+import com.sunrise.R;
+import com.sunrise.model.CurveModel;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

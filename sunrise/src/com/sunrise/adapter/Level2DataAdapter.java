@@ -42,7 +42,7 @@ public class Level2DataAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.item_mid, parent, false);
+            convertView = inflater.inflate(R.layout.item_mid2, parent, false);
             holder = new ViewHolder();
             holder.itemView = (TextView) convertView.findViewById(R.id.btn_mid);
             convertView.setTag(holder);

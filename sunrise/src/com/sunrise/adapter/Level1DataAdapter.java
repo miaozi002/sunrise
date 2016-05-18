@@ -42,6 +42,9 @@ public class Level1DataAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
+
+
+
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_mid, parent, false);
             holder = new ViewHolder();
@@ -50,8 +53,12 @@ public class Level1DataAdapter extends BaseAdapter {
         }
         holder = (ViewHolder) convertView.getTag();
 
+
         Level1Data level1Data = level1DataList.get(position);
         holder.itemView.setText(level1Data.getLabel());
+
+
+
         return convertView;
     }
 

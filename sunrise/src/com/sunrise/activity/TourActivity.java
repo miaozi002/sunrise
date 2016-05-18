@@ -1,9 +1,6 @@
 package com.sunrise.activity;
 
 import com.sunrise.R;
-import com.sunrise.R.id;
-import com.sunrise.R.layout;
-import com.sunrise.R.menu;
 
 import android.app.Activity;
 import android.os.Bundle;

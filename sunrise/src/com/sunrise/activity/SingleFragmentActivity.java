@@ -1,5 +1,7 @@
-package com.sunrise;
+package com.sunrise.activity;
 
+
+import com.sunrise.R;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

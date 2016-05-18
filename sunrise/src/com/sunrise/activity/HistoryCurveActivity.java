@@ -1,4 +1,6 @@
-package com.sunrise;
+package com.sunrise.activity;
+
+import com.sunrise.fragment.HistoryCurveFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

@@ -28,9 +28,9 @@ public class HighCategoryActivity extends Activity {
     private Level1Data level1Data;
 
     private TextView tv_title;
-    private GridView gv;
     private ListView lv_left;
     private ListView lv_right;
+    private GridView gv;
 
     private int stationId = 0;
     private int level1Id = -1;
@@ -71,14 +71,8 @@ public class HighCategoryActivity extends Activity {
         gv.setOnItemClickListener(new GridView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                level1Id = position;
-                level2Id = -1;
-                level3Id = -1;
-                lv_left.clearChoices();
-                level1Data = station.getDataItem(level1Id);
-                level2Adapter.setLevelData(level1Data.getData());
-                lv_left.setVisibility(View.VISIBLE);
-                lv_right.setVisibility(View.INVISIBLE);
+                clickGridViewItem(position);
+
             }
         });
 
@@ -100,6 +94,27 @@ public class HighCategoryActivity extends Activity {
                 startNextActivity();
             }
         });
+        if (station.getData().size()==1) {
+            clickGridViewItem(0);
+        } else {
+            clickGridViewItem(1);
+        }
+
+    }
+
+    private void clickGridViewItem(int pos) {
+        if (pos < 0 || pos >= station.getData().size())
+            return;
+        level1Id = pos;
+        level2Id = -1;
+        level3Id = -1;
+        gv.setItemChecked(pos, true);
+        gv.setSelection(pos);
+        lv_left.clearChoices();
+        level1Data = station.getDataItem(level1Id);
+        level2Adapter.setLevelData(level1Data.getData());
+        lv_left.setVisibility(View.VISIBLE);
+        lv_right.setVisibility(View.INVISIBLE);
     }
 
     private void startNextActivity() {

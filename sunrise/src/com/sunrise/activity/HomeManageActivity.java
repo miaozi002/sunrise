@@ -16,9 +16,9 @@ import android.widget.TextView;
 
 public class HomeManageActivity extends Activity {
     private GridView gvHome;
-    private static final String[] managements = { "设备管理", "任务管理", "巡视管理", "报警管理", "查岗管理", "运行分析", "交接班管理" };
+    private static final String[] managements = { "设备管理", "任务管理", "巡视管理", "报警管理", "查岗管理", "运行分析", "交接班管理","下载中心","上传文件","NFC标签管理" };
     private static int[] icons = { R.drawable.equipment, R.drawable.task, R.drawable.tour, R.drawable.warn,
-            R.drawable.inspect, R.drawable.run, R.drawable.shift };
+            R.drawable.inspect, R.drawable.run, R.drawable.shift, R.drawable.download_center,R.drawable.upload_center,R.drawable.nfc};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +40,11 @@ public class HomeManageActivity extends Activity {
                     startActivity(intent2);
                     break;
                 case 5:
-                    Intent intent5 = new Intent(HomeManageActivity.this, com.sunrise.CurveActivity.class);
+                    Intent intent5 = new Intent(HomeManageActivity.this, com.sunrise.activity.CurveActivity.class);
                     startActivity(intent5);
                     break;
-
+                case 7:
+                    break;
                 default:
                     break;
                 }

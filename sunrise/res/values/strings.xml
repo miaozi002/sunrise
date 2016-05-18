@@ -8,14 +8,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_data">DataActivity</string>
     <string name="title_activity_test">TestActivity</string>
-    <string name="query">查询</string>
     <string name="scanNFCPrompt">可在本页面扫描NFC(需先按右上角按钮下载厂站信息)</string>
-    <string name="input_keyword">输入查询关键字 (或者NFC读取ID)</string>
-    <string name="queryResult">查询结果</string>
-    <string name="switchLayer">3&#8211;5层开关</string>
+    <string name="queryResult">设备参数</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_home_manage">HomeManageActivity</string>
     <string name="stationList">站列表</string>
+    <string name="downloadFile">文件下载</string>
     <string name="title_activity_nfc">NFCActivity</string>
     <string name="realtime_curve_title">实时曲线</string>
     <string name="history_curve_title">历史曲线</string>
@@ -32,5 +30,13 @@
     <string name="select_curves">曲线选择</string>
     <string name="download">加载文件</string>
     <string name="title_activity_tour">TourActivity</string>
-
+    <string name="on_line">云联在线</string>
+    <string name="download_path">下载路径</string>
+    <string name="file_error">创建文件失败</string>
+    <string name="download_success">下载完成</string>
+    <string name="download_error">下载失败</string>
+    <string name="title_activity_download">文件下载</string>
+    <string name ="url_err">URL错误 </string>
+    <string name ="file_err">文件名错误</string>
+    <string name ="dir_err">文件目录错误</string>
 </resources>

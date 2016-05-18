@@ -1,6 +1,8 @@
-package com.sunrise;
+package com.sunrise.fragment;
 
 import java.util.Arrays;
+
+import com.sunrise.model.CurveModel;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

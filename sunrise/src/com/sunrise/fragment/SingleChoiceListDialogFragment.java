@@ -1,4 +1,6 @@
-package com.sunrise;
+package com.sunrise.fragment;
+
+import com.sunrise.model.CurveModel;
 
 import android.app.Activity;
 import android.app.AlertDialog;

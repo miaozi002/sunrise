@@ -1,8 +1,11 @@
-package com.sunrise;
+package com.sunrise.fragment;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import com.sunrise.R;
+import com.sunrise.model.CurveModel;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

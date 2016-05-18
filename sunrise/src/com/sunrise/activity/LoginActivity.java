@@ -12,11 +12,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
-import com.sunrise.R;
-import com.sunrise.jsonparser.JsonFileParser;
-import com.sunrise.model.AuthResponse;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,11 +27,21 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.sunrise.PublicInterface;
+import com.sunrise.R;
+import com.sunrise.jsonparser.JsonFileParser;
+import com.sunrise.model.AuthResponse;
+
 public class LoginActivity extends Activity {
-    private EditText etServerUrl;
-    private EditText etUsername;
-    private EditText etPassword;
-    private Button btnLogin;
+	public static final String PREF_NAME = "info";
+	private SharedPreferences m_spPreference;
+    private EditText m_etServerUrl;
+    private EditText m_etUsername;
+    private EditText m_etPassword;
+    private Button   m_btnLogin;
+    private CheckBox m_chPwd;
+    private String   m_strUsrId;
 
     private static final int MSG_NETWORK_ERROR = 1;
     private static final int MSG_AUTH_ERROR = 2;
@@ -56,26 +61,22 @@ public class LoginActivity extends Activity {
                 return;
             switch (msg.what) {
             case MSG_NETWORK_ERROR:
-                Toast.makeText(mActivity.get(), "服务器地址错误或者网络异常!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), "服务器地址错误或者网络异常 ", Toast.LENGTH_SHORT).show();
                 break;
-
             case MSG_AUTH_ERROR:
-                Toast.makeText(mActivity.get(), "用户名或者密码错误" + msg.obj, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), "用户名或者密码错误 " + msg.obj, Toast.LENGTH_SHORT).show();
                 break;
-            case MSG_AUTH_SUCESS:
-                CheckBox cb = (CheckBox) findViewById(R.id.cb);
-                if (cb.isChecked()) {
-                    SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-                    Editor ed = sp.edit();
-                    ed.putString("serverUrl", etServerUrl.getText().toString());
-                    ed.putString("username", etUsername.getText().toString());
-                    ed.putString("password", etPassword.getText().toString());
-                    ed.commit();
-                }
+            case MSG_AUTH_SUCESS:     	
+                Editor ed = m_spPreference.edit();
+                ed.putString("serverurl", m_etServerUrl.getText().toString());
+                ed.putString("username", m_etUsername.getText().toString());
+                ed.putString("password", m_etPassword.getText().toString());
+                ed.putString("usrid", m_strUsrId);
+                ed.putBoolean("ischecked", m_chPwd.isChecked());
+                ed.commit();
                 mActivity.get().startNextScreen();
                 break;
             default:
-
                 break;
             }
         }
@@ -113,19 +114,22 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        JsonFileParser.setJsonDir(getFilesDir());
-
+        
+        PublicInterface piPI = new PublicInterface(LoginActivity.this);
+        JsonFileParser.setJsonDir(piPI.m_strDownloadDir);
+        m_spPreference = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        
         setViews();
         setListeners();
         readAccount();
     }
 
     private void setViews() {
-        etServerUrl = (EditText) findViewById(R.id.et_server_url);
-        etUsername = (EditText) findViewById(R.id.et_login_username);
-        etPassword = (EditText) findViewById(R.id.et_login_password);
-        btnLogin = (Button) findViewById(R.id.btn_login);
+        m_etServerUrl = (EditText) findViewById(R.id.et_server_url);
+        m_etUsername = (EditText) findViewById(R.id.et_login_username);
+        m_etPassword = (EditText) findViewById(R.id.et_login_password);
+        m_btnLogin = (Button) findViewById(R.id.btn_login);
+        m_chPwd = (CheckBox) findViewById(R.id.cb);
     }
 
     private void startNextScreen() {
@@ -134,44 +138,47 @@ public class LoginActivity extends Activity {
     }
 
     public void readAccount() {
-        SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-        String serverUrl = sp.getString("serverUrl", "");
-        String username = sp.getString("username", "");
-        String password = sp.getString("password", "");
 
-        etUsername.setText(username);
-        etPassword.setText(password);
-        etServerUrl.setText(serverUrl);
+        m_etUsername.setText(m_spPreference.getString("username", ""));
+        m_etServerUrl.setText(m_spPreference.getString("serverurl", ""));
+        m_etPassword.setText("");
+        m_strUsrId = m_spPreference.getString("usrid", "");
+        m_chPwd.setChecked(m_spPreference.getBoolean("ischecked", false));
+        if (m_chPwd.isChecked()) {
+        	m_etPassword.setText(m_spPreference.getString("password", ""));
+        }
     }
 
-    private AuthResponse parseJsonWithGon(String jsonData) {
+    private AuthResponse parseJsonWithGson(String jsonData) {
         Gson gson = new Gson();
         return gson.fromJson(jsonData, AuthResponse.class);
     }
 
     private void setListeners() {
-        btnLogin.setOnClickListener(new OnClickListener() {
+          m_btnLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	
+            	final String serverUrl = m_etServerUrl.getText().toString();
+                final String username = m_etUsername.getText().toString();
+                final String password = m_etPassword.getText().toString();
+
+                if ( TextUtils.isEmpty(serverUrl)) {
+                    Toast.makeText(LoginActivity.this, "服务器地址不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }else if (TextUtils.isEmpty(username)) {
+                    Toast.makeText(LoginActivity.this, "用户名不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }else if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(LoginActivity.this, "密码不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
                 if (checkXmlFile()) {
-                    startActivity(new Intent(LoginActivity.this, HomeManageActivity.class));
-                    finish();
-                } else {
-                    final String serverUrl = etServerUrl.getText().toString();
-                    final String username = etUsername.getText().toString();
-                    final String password = etPassword.getText().toString();
-
-                    if (TextUtils.isEmpty(username)) {
-                        Toast.makeText(LoginActivity.this, "用户名不能为空", Toast.LENGTH_SHORT).show();
-                        return;
-                    }else if (TextUtils.isEmpty(password)) {
-                        Toast.makeText(LoginActivity.this, "密码不能为空", Toast.LENGTH_SHORT).show();
-                        return;
-                    }else if ( TextUtils.isEmpty(serverUrl)) {
-                        Toast.makeText(LoginActivity.this, "服务器地址不能为空", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
+                	mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
+                }  
+                else 
+                {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -180,17 +187,16 @@ public class LoginActivity extends Activity {
                                 mHandler.obtainMessage(MSG_NETWORK_ERROR).sendToTarget();
                                 return;
                             }
-                            AuthResponse response = parseJsonWithGon(responseStr);
+                            AuthResponse response = parseJsonWithGson(responseStr);
+                            m_strUsrId = response.getUserid();
                             if (!TextUtils.isEmpty(response.getErr())) {
                                 mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
                                 return;
                             }
+                            
                             mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
                         }
                     }).start();
-
-
-
                 }
 
             }
@@ -198,17 +204,13 @@ public class LoginActivity extends Activity {
     }
 
     protected Boolean checkXmlFile() {
-
-        SharedPreferences sp = getSharedPreferences("info", MODE_PRIVATE);
-        String username = sp.getString("username", "");
-        String password = sp.getString("password", "");
-        String serverUrl = sp.getString("serverUrl", "");
-        if (username.equals(etUsername.getText().toString()) && password.equals(etPassword.getText().toString())
-                && serverUrl.equals(etServerUrl.getText().toString())) {
+        String username = m_spPreference.getString("username", "");
+        String password = m_spPreference.getString("password", "");
+        String serverUrl = m_spPreference.getString("serverurl", "");
+        if (!TextUtils.isEmpty(username) && username.equals(m_etUsername.getText().toString()) && password.equals(m_etPassword.getText().toString())
+                && serverUrl.equals(m_etServerUrl.getText().toString())) {
             return true;
         }
         return false;
-
     }
-
 }
