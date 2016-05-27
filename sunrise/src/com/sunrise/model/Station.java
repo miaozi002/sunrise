@@ -30,7 +30,7 @@ public class Station {
     public boolean findByNfc(String nfc, NFCSearchInfo info) {
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i).findByNfc(nfc, info)) {
-                info.highCategoryId = i;
+                info.level1Id = i;
                 return true;
             }
         }

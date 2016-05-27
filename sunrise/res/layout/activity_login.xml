@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    
-
         <TextView
             style="@style/title_text"
             android:id="@+id/textView0" 
@@ -41,7 +39,7 @@
                 android:layout_toEndOf="@+id/server_icon"
                 android:layout_toRightOf="@+id/server_icon"
                 android:ems="10"
-                android:hint="服务器IP地址"
+                android:hint="@string/server_address"
                 android:inputType="textPersonName" >
             </EditText>
         </RelativeLayout>
@@ -70,7 +68,7 @@
                 android:layout_toEndOf="@+id/imageView1"
                 android:layout_toRightOf="@+id/imageView1"
                 android:ems="10"
-                android:hint="用户名"
+                android:hint="@string/username"
                 android:inputType="textPersonName" >
             </EditText>
         </RelativeLayout>
@@ -99,7 +97,7 @@
                 android:layout_toEndOf="@+id/imageView2"
                 android:layout_toRightOf="@+id/imageView2"
                 android:ems="10"
-                android:hint="密码"
+                android:hint="@string/password"
                 android:inputType="textPassword" >
             </EditText>
         </RelativeLayout>
@@ -116,15 +114,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="记住密码"
-                android:checked="true" />
+                android:text="@string/rem_pwd"
+                 />
 
             <Button
                 android:id="@+id/btn_login"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="登陆"
+                android:text="@string/login"
                 android:background="@drawable/round_rec" />
         </LinearLayout>
     </LinearLayout>

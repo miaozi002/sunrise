@@ -9,35 +9,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
         
-         
-        
-
         <TextView
             android:id="@+id/textView0"
             style="@style/title_text"
             android:text="@string/stationList" />
+        <TextView
+            android:id="@+id/tv_pre"
+            style="@style/ib_pre" 
+            android:layout_gravity="center_vertical"
+            
+          />
         
         <ImageButton
+            style="@style/ib"
             android:id="@+id/ib_upload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5pt"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/download"
             android:onClick="upload"
-            android:layout_gravity="start"
-            android:src="@android:drawable/ic_input_add" />
+            android:src="@drawable/upload"
+            android:layout_marginEnd="45dp"
+            android:layout_marginRight="45dp" />
 
         <ImageButton
-            android:id="@+id/ib_download"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5pt"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/download"
+            android:id="@+id/ib_download3"
+             style="@style/ib"
             android:onClick="download"
-            android:layout_gravity="end"
-            android:src="@drawable/download" />
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/download"
+             />
+
     </FrameLayout>
 
     <ListView
@@ -46,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="25dp"
         android:layout_marginRight="20dp" >
     </ListView>
 

@@ -1,5 +1,6 @@
 package com.sunrise.activity;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.Locale;
@@ -11,6 +12,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
+
+import com.google.gson.Gson;
+import com.sunrise.PublicInterface;
+import com.sunrise.R;
+import com.sunrise.jsonparser.JsonFileParser;
+import com.sunrise.model.AuthResponse;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,12 +34,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.sunrise.PublicInterface;
-import com.sunrise.R;
-import com.sunrise.jsonparser.JsonFileParser;
-import com.sunrise.model.AuthResponse;
-
 public class LoginActivity extends Activity {
 	public static final String PREF_NAME = "info";
 	private SharedPreferences m_spPreference;
@@ -46,6 +47,8 @@ public class LoginActivity extends Activity {
     private static final int MSG_NETWORK_ERROR = 1;
     private static final int MSG_AUTH_ERROR = 2;
     private static final int MSG_AUTH_SUCESS = 3;
+
+    private  PublicInterface piPI;
 
     private class LoginActivityMsgHandler extends Handler {
         private final WeakReference<LoginActivity> mActivity;
@@ -61,12 +64,12 @@ public class LoginActivity extends Activity {
                 return;
             switch (msg.what) {
             case MSG_NETWORK_ERROR:
-                Toast.makeText(mActivity.get(), "服务器地址错误或者网络异常 ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), R.string.server_address_error_or_network_not_connection, Toast.LENGTH_SHORT).show();
                 break;
             case MSG_AUTH_ERROR:
-                Toast.makeText(mActivity.get(), "用户名或者密码错误 " + msg.obj, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), R.string.username_or_password_error+String.valueOf(msg.obj), Toast.LENGTH_SHORT).show();
                 break;
-            case MSG_AUTH_SUCESS:     	
+            case MSG_AUTH_SUCESS:
                 Editor ed = m_spPreference.edit();
                 ed.putString("serverurl", m_etServerUrl.getText().toString());
                 ed.putString("username", m_etUsername.getText().toString());
@@ -114,11 +117,11 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        
-        PublicInterface piPI = new PublicInterface(LoginActivity.this);
+
+        piPI = new PublicInterface(LoginActivity.this);
         JsonFileParser.setJsonDir(piPI.m_strDownloadDir);
         m_spPreference = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        
+
         setViews();
         setListeners();
         readAccount();
@@ -158,26 +161,27 @@ public class LoginActivity extends Activity {
           m_btnLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	
+
             	final String serverUrl = m_etServerUrl.getText().toString();
                 final String username = m_etUsername.getText().toString();
                 final String password = m_etPassword.getText().toString();
 
                 if ( TextUtils.isEmpty(serverUrl)) {
-                    Toast.makeText(LoginActivity.this, "服务器地址不能为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.the_address_of_server_can_not_be_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }else if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(LoginActivity.this, "用户名不能为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.username_can_not_be_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }else if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "密码不能为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.password_can_not_be_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                
+
                 if (checkXmlFile()) {
+
                 	mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
-                }  
-                else 
+                }
+                else
                 {
                     new Thread(new Runnable() {
                         @Override
@@ -192,9 +196,16 @@ public class LoginActivity extends Activity {
                             if (!TextUtils.isEmpty(response.getErr())) {
                                 mHandler.obtainMessage(MSG_AUTH_ERROR, response.getErr()).sendToTarget();
                                 return;
+                            }else {
+                                //删除model中的json文件
+                                for (File file : piPI.m_strDownloadDir.listFiles()) {
+                                    file.delete();
+                                }
+
                             }
-                            
                             mHandler.obtainMessage(MSG_AUTH_SUCESS).sendToTarget();
+
+
                         }
                     }).start();
                 }

@@ -30,6 +30,8 @@ public class StationId implements Serializable {
             return false;
         if (level1Id != other.level1Id)
             return false;
+        if (level2Id != other.level2Id)
+            return false;
         if (level3Id != other.level3Id)
             return false;
 

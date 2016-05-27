@@ -22,6 +22,7 @@ public class DataSubmit {
         submitDataList.add(item);
     }
 
+
     private DataSubmitItem findExistingItem(DataSubmitItem item) {
         for (DataSubmitItem dataSubmitItem : submitDataList) {
             if (dataSubmitItem.getId().equals(item.getId()) && dataSubmitItem.getTbl().equals(item.getTbl()))
@@ -42,5 +43,9 @@ public class DataSubmit {
 
     public void expireOldData() {
         submitDataList.clear();
+    }
+
+    public void setDataToSubmit(List<DataSubmitItem> items){
+        submitDataList.addAll(items);
     }
 }

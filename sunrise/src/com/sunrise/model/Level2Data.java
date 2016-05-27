@@ -83,7 +83,7 @@ public class Level2Data {
     public boolean findByNfc(String nfc, NFCSearchInfo info) {
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i).get("NFC").equals(nfc)) {
-                info.dataId = i;
+                info.level3Id = i;
                 return true;
             }
         }

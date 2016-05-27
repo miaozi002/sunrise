@@ -45,34 +45,5 @@ public class DataSubmitItem {
         }
     }
 
-    // @Override
-    // public int hashCode() {
-    // int hashCode = 0;
-    // if (tbl != null)
-    // hashCode += tbl.hashCode();
-    // if (id != null)
-    // hashCode += id.hashCode();
-    // return hashCode;
-    // }
-    //
-    // @Override
-    // public boolean equals(Object o) {
-    // if (o == null)
-    // return false;
-    // if (!(o instanceof DataSubmitItem))
-    // return false;
-    // DataSubmitItem other = (DataSubmitItem) o;
-    // if (tbl == null && other.tbl != null)
-    // return false;
-    // else if (!tbl.equals(other.tbl))
-    // return false;
-    //
-    // if (id == null && other.id != null)
-    // return false;
-    // else if (!id.equals(other.id))
-    // return false;
-    //
-    // return true;
-    // }
 
 }

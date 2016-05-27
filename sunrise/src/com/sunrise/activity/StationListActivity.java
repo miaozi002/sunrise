@@ -4,24 +4,20 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import com.google.common.base.Preconditions;
 import com.sunrise.FileStateInterface;
-import com.sunrise.FileUpLoader;
 import com.sunrise.PublicInterface;
 import com.sunrise.R;
 import com.sunrise.adapter.StationListAdapter;
 import com.sunrise.jsonparser.JsonFileParser;
-import com.sunrise.model.FileCleaner;
+import com.sunrise.model.DataSubmit;
 import com.sunrise.model.NFCSearchInfo;
 import com.sunrise.model.StationDetail;
+import com.sunrise.model.StationId;
 import com.sunrise.model.StationVersionManager;
 import com.sunrise.model.VersionInfo;
 
@@ -46,6 +42,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,7 +56,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class StationListActivity extends AddStationList implements FileStateInterface {
-	public static final String  Tag = "StationListActivity";
+    public static final String Tag = "StationListActivity";
     public static final int MSG_DETAIL_LOAD = 1;
     public static final int MSG_VERSION_UPDATED = 2;
     public static final int MSG_UPLOAD_USERCHANGE_SUCCESS = 3;
@@ -68,21 +65,23 @@ public class StationListActivity extends AddStationList implements FileStateInte
     public static final int MSG_UPDATE_TOTAL_PROGRESS = 6;
     public static final int MSG_UPDATE_SINGLE_PROGRESS = 7;
     public static final int MSG_UPDATE_STATION_END = 8;
-    
-    private final static int REQUEST_CODE = 1;
-    private final static int REQUEST_CODE_LIST = 2;
 
-    private TextView tvFailure;
+
+    private final static int REQUEST_CODE_NFC          = 1;
+    private final static int REQUEST_CODE_UPLOAD_CLICK = 2;
+
+    // private TextView tvFailure;
     private ListView lvStationList;
     private String m_strServerUrl;
     private String m_strUsrId;
     private ImageButton downloadButton;
     private ImageButton uploadButton;
     private TextView tv_switch;
-
+    private String m_strNFCId;
     private StationListAdapter stationListAdapter;
     private List<StationDetail> stationList;
     private List<Integer> m_liUpdateList;
+    private TextView tv_pre;
 
     private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent;
@@ -91,15 +90,15 @@ public class StationListActivity extends AddStationList implements FileStateInte
     private int m_iFilesize;
     private static PublicInterface m_piPI;
 
-
     private List<Integer> m_liDownloadedList = new ArrayList<Integer>();
-    private AlertDialog   m_adDialog = null;
-    private ProgressBar   m_pbSingle;
-    private ProgressBar   m_pbTotal;
+    private AlertDialog m_adDialog = null;
+    private ProgressBar m_pbSingle;
+    private ProgressBar m_pbTotal;
     private AlertDialog.Builder m_abBuilder;
-    private View          m_vwDialogView;
-    private TextView      m_tvSingle;
-    private TextView      m_tvTotal;
+    private View m_vwDialogView;
+    private TextView m_tvSingle;
+    private TextView m_tvTotal;
+
 
     private final StationDetailMsgHandler mHandler = new StationDetailMsgHandler(this);
 
@@ -137,22 +136,22 @@ public class StationListActivity extends AddStationList implements FileStateInte
                 break;
             case MSG_UPDATE_SINGLE_PROGRESS:
                 mActivity.get().m_pbSingle.setProgress(msg.getData().getInt("size"));
-                float num = (float)mActivity.get().m_pbSingle.getProgress()/(float)mActivity.get().m_pbSingle.getMax();
-                int result = (int)(num*100);
-                mActivity.get().m_tvSingle.setText(result+ "%");
+                float num = (float) mActivity.get().m_pbSingle.getProgress() / (float) mActivity.get().m_pbSingle.getMax();
+                int result = (int) (num * 100);
+                mActivity.get().m_tvSingle.setText(result + "%");
                 break;
             case MSG_UPDATE_TOTAL_PROGRESS:
                 mActivity.get().m_pbTotal.setProgress(msg.getData().getInt("count"));
-                mActivity.get().m_tvTotal.setText(mActivity.get().m_pbTotal.getProgress()+ "/" + mActivity.get().m_pbTotal.getMax());
+                mActivity.get().m_tvTotal.setText(mActivity.get().m_pbTotal.getProgress() + "/" + mActivity.get().m_pbTotal.getMax());
                 break;
             case MSG_UPLOAD_USERCHANGE_SUCCESS:
-                Toast.makeText(mActivity.get(), "上传成功!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), R.string.upload_successfully, Toast.LENGTH_SHORT).show();
                 break;
             case MSG_UPDATE_STATION_END:
-            	mActivity.get().updateStation();
+                mActivity.get().updateStation();
                 break;
             case MSG_UPLOAD_USERCHANGE_FAIL:
-                Toast.makeText(mActivity.get(), "上传失败!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.get(), R.string.upload_failed, Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -166,16 +165,20 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
         lvStationList = (ListView) findViewById(R.id.lv_station_name);
         stationListAdapter = new StationListAdapter(this);
-        downloadButton = (ImageButton) findViewById(R.id.ib_download);
+        downloadButton = (ImageButton) findViewById(R.id.ib_download3);
         downloadButton.setVisibility(View.INVISIBLE);
         uploadButton = (ImageButton) findViewById(R.id.ib_upload);
         tv_switch = (TextView) findViewById(R.id.tv_switch);
+        tv_pre=(TextView) findViewById(R.id.tv_pre);
+        m_strNFCId = "";
 
         SharedPreferences spPreferences = getSharedPreferences(LoginActivity.PREF_NAME, Activity.MODE_PRIVATE);
         m_strServerUrl = spPreferences.getString("serverurl", "");
         StationVersionManager.getInstance().setServerUrl(m_strServerUrl);
         m_strUsrId = spPreferences.getString("usrid", "");
         m_piPI = new PublicInterface(StationListActivity.this, m_strServerUrl, m_strUsrId);
+
+        m_piPI.populateDateSubmitFromFile();
 
         nfcCheck();
 
@@ -197,17 +200,13 @@ public class StationListActivity extends AddStationList implements FileStateInte
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String filename = String.format("pack.station%s.json", stationList.get(position).getId());
                 File file = new File(m_piPI.m_strDownloadDir, filename);
-                if (!file.exists()) 
+                if (!file.exists())
                 {
-                    Toast.makeText(StationListActivity.this, "请先下载json文件", Toast.LENGTH_SHORT).show();
-                } 
-                else 
+                    Toast.makeText(StationListActivity.this, R.string.please_download_the_file, Toast.LENGTH_SHORT).show();
+                }
+                else
                 {
-                    Intent intent = new Intent(StationListActivity.this, HighCategoryActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("stationId", stationList.get(position).getId());
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                	startHighCategoryActivity(position);
                 }
 
             }
@@ -217,21 +216,58 @@ public class StationListActivity extends AddStationList implements FileStateInte
             addStationList();
         }
 
+        onViewUpload();
+
+        tv_pre.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                finish();
+            }
+        });
     }
+
+    private void startHighCategoryActivity(int position)
+    {
+    	Intent intent = new Intent(StationListActivity.this, HighCategoryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("stationId", stationList.get(position).getId());
+        intent.putExtras(bundle);
+        //startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_UPLOAD_CLICK);
+    }
+
+    private void onViewUpload()
+    {
+    	File file=new File(m_piPI.m_strUploadDir, m_piPI.MODIFY_DEV_FILE);
+        if (file.exists())
+        {
+            uploadButton.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            uploadButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
 
     private void addStationList() {
         List<StationDetail> list = m_piPI.readStationList();
         if (list != null) {
             updateStationList(list);
         } else {
-            Toast.makeText(StationListActivity.this, "加载stationList.json文件失败!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StationListActivity.this, R.string.download_stationList_json_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
     public void updateVersionUpdateList(List<Integer> updateList) {
         this.m_liUpdateList = updateList;
         stationListAdapter.setUpdateList(updateList);
-        downloadButton.setVisibility(View.VISIBLE);
+        if (!(updateList.size() == 0)) {
+            downloadButton.setVisibility(View.VISIBLE);
+        }
+
     }
 
     public void updateStationList(List<StationDetail> stationDetails) {
@@ -287,12 +323,13 @@ public class StationListActivity extends AddStationList implements FileStateInte
     private void nfcCheck() {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (mNfcAdapter == null) {
-            Toast.makeText(this, "您的手机不支持NFC功能", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.your_phone_not_support_nfc, Toast.LENGTH_LONG).show();
             return;
         } else {
             if (!mNfcAdapter.isEnabled()) {
-                new AlertDialog.Builder(StationListActivity.this).setTitle("请打开NFC开关").setMessage("请打开NFC开关，即可获取NFC标签读取服务")
-                        .setPositiveButton("开启", new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(StationListActivity.this).setTitle(R.string.please_turn_on_the_nfc_switch)
+                        .setMessage(R.string.turn_on_switch_get_nfc_read_service)
+                        .setPositiveButton(R.string.turn_on, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
@@ -341,6 +378,11 @@ public class StationListActivity extends AddStationList implements FileStateInte
         languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
         try {
             palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+            if (!TextUtils.isEmpty(m_strNFCId) && m_strNFCId.equals(palyloadStr))
+                return;
+
+            m_strNFCId = palyloadStr;
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -348,30 +390,52 @@ public class StationListActivity extends AddStationList implements FileStateInte
         NFCSearchInfo info = new NFCSearchInfo();
         if (!JsonFileParser.findStationByNFC(palyloadStr, info))
             return;
-        startNextActivity(info.stationId, info.highCategoryId, info.lowCategoryId, info.dataId);
-        tv_switch.setText("可在本页面扫描NFC");
+        startLowCategoryActivity(info);
+        tv_switch.setText("可在本页面扫描NFC(需先按右上角按钮下载厂站信息)");
     }
 
-    private void startNextActivity(int stationId, int id1, int id2, int id3) {
+    private void startLowCategoryActivity(NFCSearchInfo nfcInfo) {
         Intent intent = new Intent(StationListActivity.this, LowCategoryActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putInt("stationId", stationId);
-        bundle.putInt("highActivityId", id1);
-        bundle.putInt("midActivityId", id2);
-        bundle.putInt("dataId", id3);
+
+        StationId id = new StationId();
+        id.stid = nfcInfo.stationId;
+        id.level1Id = nfcInfo.level1Id;
+        id.level2Id = nfcInfo.level2Id;
+        id.level3Id = nfcInfo.level3Id;
+
+        bundle.putSerializable("stationId", id);
         intent.putExtras(bundle);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_NFC);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    	switch (requestCode)
+    	{
+    	case REQUEST_CODE_NFC:
+    		m_strNFCId = "";
+    		break;
+    	case REQUEST_CODE_UPLOAD_CLICK:
+    		onViewUpload();
+    		break;
+
+    	}
+
     }
 
     public void upload(View v) {
-    	m_piPI.uploadDevFile();
+        m_piPI.uploadDevFile();
+        DataSubmit.instance().expireOldData();
+        onViewUpload();
+
     }
 
     @SuppressLint("DefaultLocale")
     public void download(View v) {
-        if (m_liUpdateList.size() == 0)
-        {
-            Toast.makeText(StationListActivity.this, "没有网络或者已经是最新版本!", Toast.LENGTH_SHORT).show();
+        if (m_liUpdateList.size() == 0) {
+            Toast.makeText(StationListActivity.this, R.string.no_network_or_is_latest_version, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -379,106 +443,106 @@ public class StationListActivity extends AddStationList implements FileStateInte
         m_piPI.handleStation(StationListActivity.this);
     }
 
+    public void setUpload(){
+        uploadButton.setVisibility(View.VISIBLE);
+    }
+
     private void onViewProgress() {
         // TODO Auto-generated method stub
-    	m_abBuilder = new Builder(this);
+        m_abBuilder = new Builder(this);
 
         // 初始化对话框布局
-    	m_vwDialogView = View.inflate(getApplicationContext(), R.layout.dialog, null);
+        m_vwDialogView = View.inflate(getApplicationContext(), R.layout.dialog, null);
         m_adDialog = m_abBuilder.create();
         m_adDialog.setView(m_vwDialogView);
 
-        m_tvSingle =(TextView) m_vwDialogView.findViewById(R.id.tv_progress0);
-        m_tvTotal =(TextView) m_vwDialogView.findViewById(R.id.tv_progress);
-        
-        m_pbSingle =(ProgressBar) m_vwDialogView.findViewById(R.id.progressBar1);
+        m_tvSingle = (TextView) m_vwDialogView.findViewById(R.id.tv_progress0);
+        m_tvTotal = (TextView) m_vwDialogView.findViewById(R.id.tv_progress);
+
+        m_pbSingle = (ProgressBar) m_vwDialogView.findViewById(R.id.progressBar1);
         m_pbTotal = (ProgressBar) m_vwDialogView.findViewById(R.id.progressBar2);
         m_pbTotal.setMax(m_piPI.getStationListNums());
         m_adDialog.show();
-        
+
         m_liDownloadedList.clear();
-        
+
         Button btcancel = (Button) m_vwDialogView.findViewById(R.id.exit_dialog);
         btcancel.setOnClickListener((new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				updateStation();
-			}
-		}));
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                updateStation();
+            }
+        }));
     }
-    
-    private void updateStation()
-    {
-    	m_adDialog.dismiss();
-    	StationListActivity.this.updateVersionUpdateList(m_liUpdateList);
-    	
-    	for (int i = 0; i < m_liUpdateList.size(); i++)
-    	{
-    		int Id = m_liUpdateList.get(i);
-    		JsonFileParser.reparseJsonFile(Id);
-    		Log.d("Id",String.valueOf(Id));
-    	}
-    		
-    	if(m_liUpdateList.size() == m_liDownloadedList.size())
-    		downloadButton.setVisibility(View.INVISIBLE);
-    	
-    	m_liUpdateList.removeAll(m_liDownloadedList);
+
+    private void updateStation() {
+        m_adDialog.dismiss();
+        StationListActivity.this.updateVersionUpdateList(m_liUpdateList);
+
+        for (int i = 0; i < m_liUpdateList.size(); i++) {
+            int Id = m_liUpdateList.get(i);
+            JsonFileParser.reparseJsonFile(Id);
+            Log.d("Id", String.valueOf(Id));
+        }
+
+        if (m_liUpdateList.size() == m_liDownloadedList.size())
+            downloadButton.setVisibility(View.INVISIBLE);
+
+        m_liUpdateList.removeAll(m_liDownloadedList);
+
     }
-    
-	@Override
-	public void onFileStart(int requestCode,int stationId) {
-		// TODO Auto-generated method stub
 
-	}
+    @Override
+    public void onFileStart(int requestCode, int stationId) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void onEnd(int requestCode,int stationId) {
-		// TODO Auto-generated method stub
+    }
 
-		if (requestCode == m_piPI.REQUEST_STATION_CODE)
-		{
-			m_liDownloadedList.add(stationId);
-			
-			Message msg = new Message();
+    @Override
+    public void onEnd(int requestCode, int stationId) {
+        // TODO Auto-generated method stub
+
+        if (requestCode == m_piPI.REQUEST_STATION_CODE) {
+            m_liDownloadedList.add(stationId);
+
+            Message msg = new Message();
             msg.what = StationListActivity.MSG_UPDATE_TOTAL_PROGRESS;
             msg.getData().putInt("count", m_liDownloadedList.size());
-            mHandler.sendMessage(msg);//发送消息
-		}
-		
-	    if ((requestCode == m_piPI.REQUEST_STATION_CODE) && (m_liDownloadedList.size() >= m_piPI.getStationListNums()))
-	    	mHandler.obtainMessage(StationListActivity.MSG_UPDATE_STATION_END).sendToTarget();
-	}
+            mHandler.sendMessage(msg);// 发送消息
+        }
 
-	@Override
-	public void onFileSize(int requestCode,int stationId,int fileSize)
-	{
-		// TODO Auto-generated method stub
-	    if (requestCode == m_piPI.REQUEST_STATIONLIST_CODE)
-	        m_iFilesize = fileSize;
-	    if (requestCode == m_piPI.REQUEST_STATION_CODE)
-	    	m_pbSingle.setMax(fileSize);
-	}
+        if ((requestCode == m_piPI.REQUEST_STATION_CODE) && (m_liDownloadedList.size() >= m_piPI.getStationListNums()))
+            mHandler.obtainMessage(StationListActivity.MSG_UPDATE_STATION_END).sendToTarget();
+    }
 
-	@Override
-	public void onDownloadSize(int requestCode,int stationId,int size) {
-		// TODO Auto-generated method stub
-		if ((requestCode == m_piPI.REQUEST_STATIONLIST_CODE) && (size >= m_iFilesize))
-		    mHandler.obtainMessage(StationListActivity.MSG_ADD_STATION_LIST).sendToTarget();
+    @Override
+    public void onFileSize(int requestCode, int stationId, int fileSize) {
+        // TODO Auto-generated method stub
+        if (requestCode == m_piPI.REQUEST_STATIONLIST_CODE)
+            m_iFilesize = fileSize;
+        if (requestCode == m_piPI.REQUEST_STATION_CODE)
+            m_pbSingle.setMax(fileSize);
+    }
 
-		if ((requestCode == m_piPI.REQUEST_STATION_CODE) && (size >= m_iFilesize))
-		{
-		    Message msg = new Message();
+    @Override
+    public void onDownloadSize(int requestCode, int stationId, int size) {
+        // TODO Auto-generated method stub
+        if ((requestCode == m_piPI.REQUEST_STATIONLIST_CODE) && (size >= m_iFilesize))
+            mHandler.obtainMessage(StationListActivity.MSG_ADD_STATION_LIST).sendToTarget();
+
+        if ((requestCode == m_piPI.REQUEST_STATION_CODE) && (size >= m_iFilesize)) {
+            Message msg = new Message();
             msg.what = StationListActivity.MSG_UPDATE_SINGLE_PROGRESS;
             msg.getData().putInt("size", size);
-            mHandler.sendMessage(msg);//发送消息
-		}
-	}
+            mHandler.sendMessage(msg);// 发送消息
+        }
+    }
 
-	@Override
-	public void onDownloadFailed(int requestCode,int stationId) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onDownloadFailed(int requestCode, int stationId) {
+        // TODO Auto-generated method stub
     }
 
 }

@@ -7,10 +7,21 @@
     android:paddingBottom="10dp"
     tools:context=".LowCategoryActivity" >
 
-    <TextView
-        android:id="@+id/tv_query"
-        style="@style/title_text"
-        android:text="@string/queryResult" />
+     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_text"
+            android:text="@string/queryResult"
+             />
+        <TextView
+          style="@style/ib_pre"
+          android:id="@+id/tv_pre2"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/lv_detail"

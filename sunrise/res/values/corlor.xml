@@ -5,12 +5,13 @@
     <color name="color_pressed">#cccccc</color>
     <color name="red">#ff0000</color>
     <color name="green">#00ff00</color>
-    <color name="light_blue">#3399ff</color>
+    <color name="dark_blue">#2230DD</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="pink">#FF00FF</color>
     <color name="title_bg_blue">#0000ff</color>
-    <color name="color_normal">#000000</color>
+    <color name="color_normal">#8C8C8C</color>
     <color name="color_normal3">#999999</color>
+    <color name="login_btn">#4ebcd3</color>
 
 </resources>

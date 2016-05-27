@@ -30,6 +30,8 @@ public class EditingData {
     }
 
     public void setEditValues(StationId id, List<String> values) {
-        editMap.put(id, values);
+        List<String> list = new ArrayList<String>();
+        list.addAll(values);
+        editMap.put(id, list);
     }
 }

@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 public class HomeManageActivity extends Activity {
     private GridView gvHome;
-    private static final String[] managements = { "设备管理", "任务管理", "巡视管理", "报警管理", "查岗管理", "运行分析", "交接班管理","下载中心","上传文件","NFC标签管理" };
-    private static int[] icons = { R.drawable.equipment, R.drawable.task, R.drawable.tour, R.drawable.warn,
+    private static final String[] managements = { "设备管理", "任务管理", "巡视管理", "报警管理", "查岗管理", "运行分析", "交接班管理","下载中心","上载中心","NFC标签管理" };
+    private static int[] icons = { R.drawable.equipment_manager, R.drawable.task, R.drawable.tour, R.drawable.warn,
             R.drawable.inspect, R.drawable.run, R.drawable.shift, R.drawable.download_center,R.drawable.upload_center,R.drawable.nfc};
 
     @Override

@@ -11,7 +11,6 @@
         android:gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@android:drawable/btn_star_big_on"
         android:textColor="#000000"
         android:textSize="16sp" />
     <ImageView 
@@ -20,5 +19,19 @@
         android:layout_height="wrap_content"
         android:src="@drawable/update"
         android:visibility="invisible"/>
+    <RelativeLayout 
+         android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp">
+         <ImageView
+       android:layout_width="20dp"
+       android:layout_height="20dp"
+       android:layout_alignParentRight="true"
+		android:src="@drawable/next"        
+        />
+        
+    </RelativeLayout>
+   
 
 </LinearLayout>

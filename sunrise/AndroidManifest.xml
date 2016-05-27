@@ -18,8 +18,7 @@
         android:theme="@android:style/Theme.Light.NoTitleBar" >
         <activity
             android:name=".activity.HighCategoryActivity"
-            android:label="@string/app_name"
-            >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".activity.LowCategoryActivity"
@@ -34,41 +33,50 @@
         </activity>
         <activity
             android:name=".activity.HomeManageActivity"
-            android:label="@string/title_activity_home_manage" >
+            android:label="@string/title_activity_home_manage"
+            android:launchMode="singleTask" >
         </activity>
         <activity android:name=".activity.SplashActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.sunrise.activity.CurveActivity"
+            android:name=".activity.CurveActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.sunrise.activity.RealtimeCurveActivity"
+            android:name=".activity.RealtimeCurveActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.sunrise.activity.HistoryCurveActivity"
+            android:name=".activity.HistoryCurveActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity android:name="org.achartengine.GraphicalActivity" />
         <activity
-            android:name="com.sunrise.activity.NFCActivity"
-            android:label="@string/title_activity_nfc" 
-            android:launchMode="singleTask">
+            android:name=".activity.NFCActivity"
+            android:label="@string/title_activity_nfc"
+            android:launchMode="singleTask" >
         </activity>
         <activity
-            android:name="com.sunrise.activity.TourActivity"
+            android:name=".activity.TourActivity"
             android:label="@string/title_activity_tour" >
         </activity>
+        <activity android:name=".activity.DownloadActivity" >
+        </activity>
         <activity
-            android:name="com.sunrise.activity.DownloadActivity" >
+            android:name=".activity.DownloadCenterActivity"
+            android:label="@string/title_activity_download_center" >
+        </activity>
+        <activity
+            android:name=".UploadCenterActivity"
+            android:label="@string/title_activity_upload_center" >
         </activity>
     </application>
 

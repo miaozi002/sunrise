@@ -57,8 +57,6 @@ public class Level1DataAdapter extends BaseAdapter {
         Level1Data level1Data = level1DataList.get(position);
         holder.itemView.setText(level1Data.getLabel());
 
-
-
         return convertView;
     }
 

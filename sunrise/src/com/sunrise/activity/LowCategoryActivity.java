@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class LowCategoryActivity extends Activity {
@@ -36,6 +37,7 @@ public class LowCategoryActivity extends Activity {
     private ListView lvDetail;
     private Button saveButton;
     LowCategoryListViewAdapter lowCategoryListViewAdapter;
+    private TextView tv_pre2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,8 @@ public class LowCategoryActivity extends Activity {
         lvDetail = (ListView) findViewById(R.id.lv_detail);
         saveButton = (Button) findViewById(R.id.btn_save);
         saveButton.setVisibility(View.INVISIBLE);
+        tv_pre2=(TextView) findViewById(R.id.tv_pre2);
+
 
         Bundle bundle = this.getIntent().getExtras();
         stationId = (StationId) bundle.getSerializable("stationId");
@@ -62,8 +66,17 @@ public class LowCategoryActivity extends Activity {
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
+        tv_pre2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
 
     }
+
 
     @Override
     protected void onPause() {
@@ -121,14 +134,16 @@ public class LowCategoryActivity extends Activity {
 
         String changedContentDesc = sb.toString();
         if (changedContentDesc.trim().equals("")) {
-            Toast.makeText(LowCategoryActivity.this, "没有需要更新的数据!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LowCategoryActivity.this, R.string.no_data_need_update, Toast.LENGTH_SHORT).show();
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(LowCategoryActivity.this);
         builder.setIcon(android.R.drawable.ic_dialog_alert);
-        builder.setTitle("提示");
-        builder.setMessage("确定更新以下数据:\n" + changedContentDesc);
-        builder.setPositiveButton("确定", new OnClickListener() {
+        builder.setTitle(R.string.reminder);
+        builder.setMessage("确定更改一下数据:\n"+ changedContentDesc);
+        builder.setPositiveButton(R.string.confirm, new  DialogInterface.OnClickListener() {
+
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 EditingData.instance().setEditValues(stationId, newValues);
@@ -142,6 +157,7 @@ public class LowCategoryActivity extends Activity {
                     FileOutputStream fos = new FileOutputStream(file);
                     fos.write(jsonContent.getBytes());
                     fos.close();
+
                 }
                 catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -154,7 +170,9 @@ public class LowCategoryActivity extends Activity {
             }
 
         });
-        builder.setNegativeButton("取消", new OnClickListener() {
+
+
+        builder.setNegativeButton(R.string.cancel, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -163,7 +181,9 @@ public class LowCategoryActivity extends Activity {
         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
     }
+
 
     public void setSaveButtonVisible() {
         saveButton.setVisibility(View.VISIBLE);
