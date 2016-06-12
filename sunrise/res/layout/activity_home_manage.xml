@@ -4,16 +4,32 @@
     android:layout_height="match_parent"
     tools:context="com.sunrise.activity.HomeManageActivity" >
 
-    <TextView
-        android:id="@+id/tv_title"
-        style="@style/title_text"
-        android:text="@string/on_line" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fl_title_bar" >
+       
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_text"
+            android:text="@string/on_line" />
+        
+         <ImageView 
+            android:id="@+id/iv_popupWindow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/home"
+            android:layout_marginRight="15dp"
+            android:onClick="showPopupWindow"
+            android:layout_gravity="right|center_vertical"/>
+    </FrameLayout>
 
     <GridView
         android:id="@+id/gv_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_title"
+        android:layout_below="@id/fl_title_bar"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="20dp"

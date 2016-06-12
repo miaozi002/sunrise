@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sunrise"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="版本号: 2.0" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -75,8 +75,16 @@
             android:label="@string/title_activity_download_center" >
         </activity>
         <activity
-            android:name=".UploadCenterActivity"
+            android:name=".activity.UploadCenterActivity"
             android:label="@string/title_activity_upload_center" >
+        </activity>
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home" >
+        </activity>
+        <activity
+            android:name="com.sunrise.activity.AboutSystemActivity"
+            android:label="@string/title_activity_about_system" >
         </activity>
     </application>
 

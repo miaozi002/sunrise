@@ -16,9 +16,8 @@
             style="@style/title_text"
             android:text="@string/queryResult"
              />
-        <TextView
+        <ImageView
           style="@style/ib_pre"
-          android:id="@+id/tv_pre2"
             android:layout_centerVertical="true"/>
 
     </RelativeLayout>

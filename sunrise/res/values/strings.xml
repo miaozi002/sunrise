@@ -39,6 +39,7 @@
     <string name="download">加载文件</string>
     <string name="title_activity_tour">TourActivity</string>
     <string name="on_line">云联在线</string>
+    <string name="about_system">关于系统</string>
     <string name="download_path">下载路径</string>
     <string name="file_error">创建文件失败</string>
     <string name="download_success">下载完成</string>
@@ -47,7 +48,7 @@
     <string name="file_err">文件名错误</string>
     <string name="dir_err">文件目录错误</string>
     <string name="username_or_password_error">用户名或者密码错误 </string>
-    <string name="server_address_error_or_network_not_connection">服务器地址错误或者网络异常</string>
+    <string name="server_address_error_or_network_not_connection">服务器地址异常或者网络异常</string>
     <string name="no_network_or_is_latest_version">没有网络或者已经是最新版本!</string>
     <string name="the_address_of_server_can_not_be_empty">服务器地址不能为空</string>
     <string name="username_can_not_be_empty">用户名不能为空</string>
@@ -56,6 +57,7 @@
     <string name="reminder">提示</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
+    <string name="quit">退出登录</string>
     <string name="your_phone_not_support_nfc">您的手机不支持NFC功能</string>
     <string name="please_turn_on_the_nfc_switch">请打开NFC开关</string>
     <string name="turn_on_switch_get_nfc_read_service">请打开NFC开关，即可获取NFC标签读取服务</string>
@@ -67,5 +69,7 @@
     <string name="download_stationList_json_failed">加载stationList.json文件失败!</string>
     <string name="title_activity_download_center">DownloadCenterActivity</string>
     <string name="title_activity_upload_center">UploadCenterActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_about_system">AboutSystemActivity</string>
 
 </resources>

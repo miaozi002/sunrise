@@ -11,14 +11,11 @@
 
         <TextView
             android:id="@+id/tv_title"
-            style="@style/title_text"
-             />
-        <TextView
-            android:id="@+id/tv_pre1"
-           style="@style/ib_pre"
-            android:layout_centerVertical="true"/>
+            style="@style/title_text" />
 
-       
+        <ImageView
+            style="@style/ib_pre"
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
     <LinearLayout
@@ -31,26 +28,49 @@
         android:layout_weight="1"
         android:baselineAligned="false" >
 
-        <ExpandableListView
-            android:id="@+id/exp_lv"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
-        </ExpandableListView>
+
+            <ExpandableListView
+                android:id="@+id/exp_lv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" 
+                android:layout_alignParentLeft="true"
+                >
+            </ExpandableListView>
+        </RelativeLayout>
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/gridView1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:alwaysDrawnWithCache="true"
-        android:choiceMode="singleChoice"
-        android:drawSelectorOnTop="false"
-        android:gravity="center_horizontal"
-        android:horizontalSpacing="10dp"
-        android:listSelector="@android:color/transparent"
-        android:numColumns="3"
-        
-        />
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_all"
+            android:onClick="pressBtnAll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginRight="8dp"
+            android:layout_weight="0.95"
+            android:background="@drawable/btn_all_selector"
+            android:text="全部" />
+
+        <GridView
+            android:id="@+id/gridView1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:alwaysDrawnWithCache="true"
+            android:choiceMode="singleChoice"
+            android:drawSelectorOnTop="false"
+            android:gravity="center_horizontal"
+            android:horizontalSpacing="10dp"
+            android:listSelector="@android:color/transparent"
+            android:numColumns="3" />
+    </LinearLayout>
 
 </LinearLayout>

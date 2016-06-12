@@ -13,5 +13,6 @@
     <color name="color_normal">#8C8C8C</color>
     <color name="color_normal3">#999999</color>
     <color name="login_btn">#4ebcd3</color>
+    <color name="bottom_button_text_gray">#999999</color>
 
 </resources>

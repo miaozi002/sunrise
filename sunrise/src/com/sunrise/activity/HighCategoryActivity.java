@@ -13,8 +13,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.GridView;
@@ -29,8 +29,9 @@ public class HighCategoryActivity extends Activity {
 
     private TextView tv_title;
     private ExpandableListView exp_lv;
+    //private ExpandableListView exp_lv_all;
     private GridView gv;
-    private TextView tv_pre1;
+    private Button btnAll;
 
     private int stationId = 0;
     private int level1Id = -1;
@@ -39,6 +40,7 @@ public class HighCategoryActivity extends Activity {
 
     private Level1DataAdapter level1Adapter;
     private Level2DataAdapter level2Adapter;
+    //public Level2DataAdapter btnAllAdapter;
 
     private Intent lowCategoryIntent;
 
@@ -50,9 +52,11 @@ public class HighCategoryActivity extends Activity {
         tv_title = (TextView) findViewById(R.id.tv_title);
         gv = (GridView) findViewById(R.id.gridView1);
         exp_lv =  (ExpandableListView) findViewById(R.id.exp_lv);
+        //exp_lv_all=(ExpandableListView) findViewById(R.id.exp_lv_all);
+        btnAll=(Button) findViewById(R.id.btn_all);
+
         lowCategoryIntent = new Intent(HighCategoryActivity.this, LowCategoryActivity.class);
         lowCategoryIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        tv_pre1=(TextView) findViewById(R.id.tv_pre1);
 
         initStation();
 
@@ -60,10 +64,14 @@ public class HighCategoryActivity extends Activity {
         level1Adapter.setLevelData(station.getData());
 
         level2Adapter = new Level2DataAdapter(this);
+        //btnAllAdapter=new Level2DataAdapter(this);
 
         tv_title.setText(station.getLabel());
         gv.setAdapter(level1Adapter);
         exp_lv.setAdapter(level2Adapter);
+
+
+
 
         gv.setOnItemClickListener(new GridView.OnItemClickListener() {
             @Override
@@ -94,14 +102,22 @@ public class HighCategoryActivity extends Activity {
             clickGridViewItem(1);
         }
 
-        tv_pre1.setOnClickListener(new OnClickListener() {
+    }
 
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+    public void pressBtnAll(View v){
+        v.setSelected(true);
+       // cancelGridViewItem();
+        level1Id = -1;
+        level2Adapter.setLevelData(station.getAllLevel2Data());
+        for (int i = 0; i < gv.getCount(); i++) {
+            gv.setItemChecked(i, false);
+        }
+        //exp_lv_all.setAdapter(btnAllAdapter);
+        //btnAllAdapter.setLevelData(level1Data.getData());
+    }
 
+    public void getBack(View view){
+        finish();
     }
 
     private void clickGridViewItem(int pos) {
@@ -111,21 +127,18 @@ public class HighCategoryActivity extends Activity {
         level2Id = -1;
         level3Id = -1;
         gv.setItemChecked(pos, true);
+        btnAll.setSelected(false);
         gv.setSelection(pos);
         exp_lv.clearChoices();
         level1Data = station.getDataItem(level1Id);
         level2Adapter.setLevelData(level1Data.getData());
         exp_lv.setVisibility(View.VISIBLE);
     }
-
-   /* public void previous(View v)
-    {
-    	Intent intent=new Intent();
-        intent.putExtra("back", "Back Data");
-        setResult(2, intent);
-
-        finish();
+   /* public void cancelGridViewItem(){
+        int curPos=(Integer) gv.getSelectedItem();
+        gv.setItemChecked(curPos, false);
     }*/
+
 
     private void startNextActivity() {
 

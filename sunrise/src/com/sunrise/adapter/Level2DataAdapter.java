@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sunrise.R;
 import com.sunrise.activity.HighCategoryActivity;
+import com.sunrise.model.Level1Data;
 import com.sunrise.model.Level2Data;
 
 import android.content.Context;
@@ -18,6 +19,7 @@ public class Level2DataAdapter extends BaseExpandableListAdapter {
     private LayoutInflater inflater;
     private HighCategoryActivity activity;
     private Level2Data level2Data;
+    private List<Level1Data> level1DataList;
 
     public Level2DataAdapter(Context cxt) {
         inflater = LayoutInflater.from(cxt);
@@ -85,7 +87,7 @@ public class Level2DataAdapter extends BaseExpandableListAdapter {
         }
         holder = (ViewHolder) convertView.getTag();
         level2Data = level2DataList.get(groupPosition);
-        holder.itemView.setText("             "+level2Data.getLabel());
+        holder.itemView.setText("           "+level2Data.getLabel());
         return convertView;
     }
 
@@ -99,7 +101,7 @@ public class Level2DataAdapter extends BaseExpandableListAdapter {
             convertView.setTag(holder);
         }
         holder = (ViewHolder) convertView.getTag();
-        holder.itemView2.setText("                        "+level2DataList.get(groupPosition).getData().get(childPosition).get("name"));
+        holder.itemView2.setText("                  "+level2DataList.get(groupPosition).getData().get(childPosition).get("name"));
         return convertView;
     }
 

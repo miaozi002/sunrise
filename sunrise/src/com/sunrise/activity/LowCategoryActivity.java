@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 
 import com.sunrise.PublicInterface;
@@ -27,7 +29,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class LowCategoryActivity extends Activity {
@@ -37,7 +38,6 @@ public class LowCategoryActivity extends Activity {
     private ListView lvDetail;
     private Button saveButton;
     LowCategoryListViewAdapter lowCategoryListViewAdapter;
-    private TextView tv_pre2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,6 @@ public class LowCategoryActivity extends Activity {
         lvDetail = (ListView) findViewById(R.id.lv_detail);
         saveButton = (Button) findViewById(R.id.btn_save);
         saveButton.setVisibility(View.INVISIBLE);
-        tv_pre2=(TextView) findViewById(R.id.tv_pre2);
 
 
         Bundle bundle = this.getIntent().getExtras();
@@ -54,27 +53,27 @@ public class LowCategoryActivity extends Activity {
 
         try {
             Station station = JsonFileParser.getStationWrapper(stationId.stid).getStation();
-            Level1Data level1Data = station.getDataItem(stationId.level1Id);
-            level2Data = level1Data.getLevel2DataItem(stationId.level2Id);
+            if (stationId.level1Id >= 0) {
+                Level1Data level1Data = station.getDataItem(stationId.level1Id);
+                level2Data = level1Data.getLevel2DataItem(stationId.level2Id);
+            } else {
+                level2Data = station.getAllLevel2Data().get(stationId.level2Id);
+            }
             lowCategoryListViewAdapter = new LowCategoryListViewAdapter(this);
             if (EditingData.instance().getEditValues(stationId) == null) {
                 EditingData.instance().createEditValues(stationId).addAll(level2Data.getValues(stationId.level3Id));
             }
-            lowCategoryListViewAdapter.setData(level2Data.getKeyDisplayName(), EditingData.instance().getEditValues(stationId));
+            lowCategoryListViewAdapter.setData(level2Data.getKeyDisplayName(), EditingData.instance().getEditValues(stationId), level2Data.getEditNumbers());
             lvDetail.setAdapter(lowCategoryListViewAdapter);
-
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
-        tv_pre2.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
 
+    }
+
+    public void getBack(View view){
+        finish();
     }
 
 
@@ -148,14 +147,19 @@ public class LowCategoryActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 EditingData.instance().setEditValues(stationId, newValues);
                 DataSubmit.instance().addDataToSubmit(detail);
-                String jsonContent = DataSubmit.instance().commit();
+                String str = DataSubmit.instance().commit();
 
                 try
                 {
                     PublicInterface piPI = new PublicInterface(LowCategoryActivity.this);
-                    File file = new File(piPI.m_strUploadDir,piPI.MODIFY_DEV_FILE);
+                    File file = new File(piPI.m_strUploadDir,piPI.m_strUsrId+piPI.MODIFY_DEV_FILE);
                     FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(jsonContent.getBytes());
+                    Writer out=new OutputStreamWriter(fos, "UTF-8");
+                    String jsonContent=piPI.toASCII(str);
+                    if (jsonContent!=null) {
+                        out.write(jsonContent);
+                    }
+                    out.close();
                     fos.close();
 
                 }

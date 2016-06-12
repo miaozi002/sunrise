@@ -15,34 +15,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="28dp" >
-         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp" >
-
-            <ImageView
-                android:id="@+id/server_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:paddingTop="8dp"
-                android:src="@drawable/server_icon" />
-
-            <EditText
-                android:id="@+id/et_server_url"
-                android:layout_width="match_parent"
-                android:layout_height="38dp"
-                android:layout_alignBaseline="@+id/server_icon"
-                android:layout_marginStart="@dimen/margin_middle"
-                android:layout_marginLeft="@dimen/margin_middle"
-                android:layout_toEndOf="@+id/server_icon"
-                android:layout_toRightOf="@+id/server_icon"
-                android:ems="10"
-                android:hint="@string/server_address"
-                android:inputType="textPersonName" >
-            </EditText>
-        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -101,6 +73,15 @@
                 android:inputType="textPassword" >
             </EditText>
         </RelativeLayout>
+        
+        <TextView
+            android:id="@+id/tv_setting" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  登陆设置"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/sys_setting"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

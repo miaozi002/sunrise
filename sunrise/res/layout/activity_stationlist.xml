@@ -13,8 +13,7 @@
             android:id="@+id/textView0"
             style="@style/title_text"
             android:text="@string/stationList" />
-        <TextView
-            android:id="@+id/tv_pre"
+        <ImageView
             style="@style/ib_pre" 
             android:layout_gravity="center_vertical"
             

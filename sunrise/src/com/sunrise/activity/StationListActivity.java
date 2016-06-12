@@ -29,7 +29,6 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -42,7 +41,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -55,7 +53,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class StationListActivity extends AddStationList implements FileStateInterface {
+public class StationListActivity extends Activity implements FileStateInterface {
     public static final String Tag = "StationListActivity";
     public static final int MSG_DETAIL_LOAD = 1;
     public static final int MSG_VERSION_UPDATED = 2;
@@ -67,8 +65,8 @@ public class StationListActivity extends AddStationList implements FileStateInte
     public static final int MSG_UPDATE_STATION_END = 8;
 
 
-    private final static int REQUEST_CODE_NFC          = 1;
-    private final static int REQUEST_CODE_UPLOAD_CLICK = 2;
+   // private final static int REQUEST_CODE_NFC          = 1;
+    private final static int REQUEST_CODE_UPLOAD_CLICK = 1;
 
     // private TextView tvFailure;
     private ListView lvStationList;
@@ -77,11 +75,10 @@ public class StationListActivity extends AddStationList implements FileStateInte
     private ImageButton downloadButton;
     private ImageButton uploadButton;
     private TextView tv_switch;
-    private String m_strNFCId;
+   // private String m_strNFCId;
     private StationListAdapter stationListAdapter;
     private List<StationDetail> stationList;
     private List<Integer> m_liUpdateList;
-    private TextView tv_pre;
 
     private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent;
@@ -90,7 +87,7 @@ public class StationListActivity extends AddStationList implements FileStateInte
     private int m_iFilesize;
     private static PublicInterface m_piPI;
 
-    private List<Integer> m_liDownloadedList = new ArrayList<Integer>();
+    public List<Integer> m_liDownloadedList = new ArrayList<Integer>();
     private AlertDialog m_adDialog = null;
     private ProgressBar m_pbSingle;
     private ProgressBar m_pbTotal;
@@ -101,6 +98,7 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
 
     private final StationDetailMsgHandler mHandler = new StationDetailMsgHandler(this);
+    private String palyloadStr;
 
     public static class StationDetailMsgHandler extends Handler {
         private final WeakReference<StationListActivity> mActivity;
@@ -169,14 +167,10 @@ public class StationListActivity extends AddStationList implements FileStateInte
         downloadButton.setVisibility(View.INVISIBLE);
         uploadButton = (ImageButton) findViewById(R.id.ib_upload);
         tv_switch = (TextView) findViewById(R.id.tv_switch);
-        tv_pre=(TextView) findViewById(R.id.tv_pre);
-        m_strNFCId = "";
+       // m_strNFCId = "";
 
-        SharedPreferences spPreferences = getSharedPreferences(LoginActivity.PREF_NAME, Activity.MODE_PRIVATE);
-        m_strServerUrl = spPreferences.getString("serverurl", "");
-        StationVersionManager.getInstance().setServerUrl(m_strServerUrl);
-        m_strUsrId = spPreferences.getString("usrid", "");
-        m_piPI = new PublicInterface(StationListActivity.this, m_strServerUrl, m_strUsrId);
+
+        m_piPI = new PublicInterface(StationListActivity.this);
 
         m_piPI.populateDateSubmitFromFile();
 
@@ -218,14 +212,11 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
         onViewUpload();
 
-        tv_pre.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                finish();
-            }
-        });
+    }
+
+    public void getBack(View view){
+        finish();
     }
 
     private void startHighCategoryActivity(int position)
@@ -240,7 +231,7 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
     private void onViewUpload()
     {
-    	File file=new File(m_piPI.m_strUploadDir, m_piPI.MODIFY_DEV_FILE);
+    	File file=new File(m_piPI.m_strUploadDir, m_piPI.m_strUsrId+m_piPI.MODIFY_DEV_FILE);
         if (file.exists())
         {
             uploadButton.setVisibility(View.VISIBLE);
@@ -252,7 +243,7 @@ public class StationListActivity extends AddStationList implements FileStateInte
     }
 
 
-    private void addStationList() {
+    public void addStationList() {
         List<StationDetail> list = m_piPI.readStationList();
         if (list != null) {
             updateStationList(list);
@@ -317,7 +308,11 @@ public class StationListActivity extends AddStationList implements FileStateInte
             messages = new NdefMessage[] { msg };
         }
         processNDEFMsg(messages);
-
+        NFCSearchInfo info = new NFCSearchInfo();
+        if (!JsonFileParser.findStationByNFC(palyloadStr, info))
+            return;
+        startLowCategoryActivity(info);
+        tv_switch.setText("可在本页面扫描NFC(需先按右上角按钮下载厂站信息)");
     }
 
     private void nfcCheck() {
@@ -367,7 +362,7 @@ public class StationListActivity extends AddStationList implements FileStateInte
     private void parseTextRecord(NdefRecord record) {
         Preconditions.checkArgument(record.getTnf() == NdefRecord.TNF_WELL_KNOWN);
         Preconditions.checkArgument(Arrays.equals(record.getType(), NdefRecord.RTD_TEXT));
-        String palyloadStr = "";
+        palyloadStr = "";
         byte[] payload = record.getPayload();
         Byte statusByte = record.getPayload()[0];
         String textEncoding = "";
@@ -378,20 +373,20 @@ public class StationListActivity extends AddStationList implements FileStateInte
         languageCode = new String(payload, 1, languageCodeLength, Charset.forName("UTF-8"));
         try {
             palyloadStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
-            if (!TextUtils.isEmpty(m_strNFCId) && m_strNFCId.equals(palyloadStr))
+          /*  if (!TextUtils.isEmpty(m_strNFCId) && m_strNFCId.equals(palyloadStr))
                 return;
 
-            m_strNFCId = palyloadStr;
+            m_strNFCId = palyloadStr;*/
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         tv_switch.setText(palyloadStr);
-        NFCSearchInfo info = new NFCSearchInfo();
+       /* NFCSearchInfo info = new NFCSearchInfo();
         if (!JsonFileParser.findStationByNFC(palyloadStr, info))
             return;
         startLowCategoryActivity(info);
-        tv_switch.setText("可在本页面扫描NFC(需先按右上角按钮下载厂站信息)");
+        tv_switch.setText("可在本页面扫描NFC(需先按右上角按钮下载厂站信息)");*/
     }
 
     private void startLowCategoryActivity(NFCSearchInfo nfcInfo) {
@@ -406,7 +401,8 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
         bundle.putSerializable("stationId", id);
         intent.putExtras(bundle);
-        startActivityForResult(intent, REQUEST_CODE_NFC);
+        startActivity(intent);
+       //startActivityForResult(intent, REQUEST_CODE_NFC);
     }
 
     @Override
@@ -414,9 +410,9 @@ public class StationListActivity extends AddStationList implements FileStateInte
 
     	switch (requestCode)
     	{
-    	case REQUEST_CODE_NFC:
+    	/*case REQUEST_CODE_NFC:
     		m_strNFCId = "";
-    		break;
+    		break;*/
     	case REQUEST_CODE_UPLOAD_CLICK:
     		onViewUpload();
     		break;

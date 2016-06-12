@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.sunrise.R;
 import com.sunrise.activity.LowCategoryActivity;
+import com.sunrise.model.Level2Data;
 
 import android.annotation.SuppressLint;
 import android.text.Editable;
@@ -20,19 +21,25 @@ import android.widget.TextView;
 public class LowCategoryListViewAdapter extends BaseAdapter {
     private List<String> keys;
     private List<String> values;
+    private List<String> editableIndicators;
     private LayoutInflater layoutInflater;
     private LowCategoryActivity activity;
+    private Level2Data level2Data;
 
     public LowCategoryListViewAdapter(LowCategoryActivity context) {
         activity = context;
         layoutInflater = LayoutInflater.from(activity);
     }
 
-    public void setData(Collection<String> keys, Collection<String> values) {
+
+    public void setData(Collection<String> keys, Collection<String> values, Collection<String> editableIndicators) {
         this.keys = new ArrayList<String>();
         this.keys.addAll(keys);
         this.values = new ArrayList<String>();
         this.values.addAll(values);
+        this.editableIndicators=new ArrayList<String>();
+        this.editableIndicators.addAll(editableIndicators);
+
         notifyDataSetChanged();
     }
 
@@ -65,6 +72,15 @@ public class LowCategoryListViewAdapter extends BaseAdapter {
         EditText etKeyValue = (EditText) convertView.findViewById(R.id.item_et_detail);
         tvKey.setText(keys.get(position));
         etKeyValue.setText(values.get(position));
+
+        if (editableIndicators.get(position).equals(String.valueOf(0)))
+        {
+            etKeyValue.setEnabled(false);
+        }
+        else
+        {
+            etKeyValue.setEnabled(true);
+        }
 
         etKeyValue.addTextChangedListener(new TextWatcher() {
 
