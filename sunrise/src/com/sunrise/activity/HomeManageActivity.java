@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -115,9 +114,8 @@ public class HomeManageActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable(null, ""));
-        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        int xPos = windowManager.getDefaultDisplay().getWidth() / 2 - popupWindow.getWidth() / 2;
-        popupWindow.showAsDropDown(parent, xPos, 30);
+        //WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        popupWindow.showAsDropDown(parent, -100, 26);
 
         lvPopup.setOnItemClickListener(new OnItemClickListener() {
 
