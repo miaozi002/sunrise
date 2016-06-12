@@ -116,8 +116,8 @@ public class HomeManageActivity extends Activity {
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable(null, ""));
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        int xPos = windowManager.getDefaultDisplay().getWidth() / 2 - popupWindow.getWidth() / 2 - 10;
-        popupWindow.showAsDropDown(parent, xPos, 20);
+        int xPos = windowManager.getDefaultDisplay().getWidth() / 2 - popupWindow.getWidth() / 2 - 130;
+        popupWindow.showAsDropDown(parent, xPos, 30);
 
         lvPopup.setOnItemClickListener(new OnItemClickListener() {
 
